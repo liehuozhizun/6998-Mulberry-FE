@@ -13,7 +13,7 @@ const HeaderLeftBase = styled.div`
       color: ${COLORS.PINK_T};
       margin: 0.75em 0 0.75em 0.5em;
       padding-left: 0.5em;
-      font-size: 26px;
+      font-size: 24px;
     }
   }
 `;
@@ -45,7 +45,7 @@ const HeaderRightBase = styled.div`
   & > a {
     color: ${COLORS.PINK_T};
     padding-right: 1em;
-    font-size: 20px;
+    font-size: 18px;
   }
 `;
 
