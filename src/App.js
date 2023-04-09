@@ -5,6 +5,7 @@ import {Header} from "./components/header";
 import {Home} from "./components/home";
 import {SignIn} from "./components/signin";
 import {SignUp} from "./components/signup";
+import {useState} from "react";
 
 const GridBase = styled.div`
   display: grid;
@@ -19,13 +20,22 @@ const GridBase = styled.div`
     grid-template-rows: auto auto auto;
     grid-template-areas:
       "hd hd hd hd hd"
-      "sb sb main main main"
+      "main main main main main"
       "ft ft ft ft ft";
   }
 `;
 
+// const defaultUser = {
+//     username: "",
+//     first_name: "",
+//     last_name: "",
+//     email: ""
+// };
+
 
 function App() {
+    // const [state, setState] = useState(defaultUser);
+
     return (
         <BrowserRouter>
             <GridBase>

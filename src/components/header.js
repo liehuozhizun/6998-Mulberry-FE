@@ -1,23 +1,19 @@
-"use strict";
-
 import React, {Fragment} from "react";
-// import PropTypes from "prop-types";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-
-
-const fontColor = "#c4a1a1";
+import {Link} from "react-router-dom";
+import {COLORS} from "./shared";
 
 const HeaderLeftBase = styled.div`
   flex-grow: 1;
-  font-style: italic;
 
   & > a {
     text-decoration: none;
 
     & > h2 {
-      color: ${fontColor};
+      color: ${COLORS.PINK_T};
       margin: 0.75em 0 0.75em 0.5em;
+      padding-left: 0.5em;
+      font-size: 26px;
     }
   }
 `;
@@ -25,8 +21,8 @@ const HeaderLeftBase = styled.div`
 const HeaderLeft = () => {
     return (
         <HeaderLeftBase>
-            <Link to='/'>
-                <h2>Mulberry</h2>
+            <Link to="/">
+                <h2>MULBERRY</h2>
             </Link>
         </HeaderLeftBase>
     );
@@ -45,9 +41,11 @@ const HeaderRightBase = styled.div`
   justify-content: center;
   align-items: center;
   padding-right: 0.5em;
+
   & > a {
-    color: ${fontColor};
-    padding-right: 0.5em;
+    color: ${COLORS.PINK_T};
+    padding-right: 1em;
+    font-size: 20px;
   }
 `;
 
@@ -76,14 +74,13 @@ const HeaderRight = () => {
 const HeaderBase = styled.div`
   grid-area: hd;
   display: flex;
-  background: #000;
-  //height: 50px;
+  background: ${COLORS.PURPLE_T};
 `;
 
 export const Header = () => (
     <HeaderBase>
-        <HeaderLeft />
-        <HeaderRight />
+        <HeaderLeft/>
+        <HeaderRight/>
     </HeaderBase>
 );
 
