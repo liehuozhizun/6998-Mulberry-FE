@@ -56,7 +56,7 @@ const FormInput = styled.input`
   height: 30px;
   border: 3px solid #000000;
   font-weight: 400;
-  font-size: 24px;
+  font-size: 16px;
 `;
 
 const FormButton = styled.button`
