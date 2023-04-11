@@ -6,6 +6,8 @@ import {Home} from "./components/home";
 import {SignIn} from "./components/signin";
 import {SignUp} from "./components/signup";
 import {useState} from "react";
+import {Profile} from "./components/profile";
+import {EditProfile} from "./components/editprofile";
 
 const GridBase = styled.div`
   display: grid;
@@ -49,7 +51,14 @@ function App() {
                     path="/signup"
                     render={() => <SignUp/>}
                 />
-
+                <Route
+                    path="/profile"
+                    render={() => <Profile/>}
+                />
+                <Route
+                    path="/editprofile"
+                    render={() => <EditProfile/>}
+                />
             </GridBase>
         </BrowserRouter>
 
