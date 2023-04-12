@@ -9,7 +9,8 @@ export const COLORS = {
     ORANGE_T: "#FFB84C",
     WHITE_T: "#FFFFFF",
     GREY_T: "#D9D9D9",
-    BROWN_T: "#B3A0A0"
+    BROWN_T: "#B3A0A0",
+    BLUE_T: "#A0D3F8"
 };
 
 

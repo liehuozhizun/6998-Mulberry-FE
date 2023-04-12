@@ -8,6 +8,7 @@ import {SignUp} from "./components/signup";
 import {useState} from "react";
 import {Profile} from "./components/profile";
 import {EditProfile} from "./components/editprofile";
+import {ChangePassword} from "./components/changepass";
 
 const GridBase = styled.div`
   display: grid;
@@ -58,6 +59,10 @@ function App() {
                 <Route
                     path="/editprofile"
                     render={() => <EditProfile/>}
+                />
+                <Route
+                    path="/changepass"
+                    render={() => <ChangePassword />}
                 />
             </GridBase>
         </BrowserRouter>
