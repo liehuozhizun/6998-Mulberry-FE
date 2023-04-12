@@ -9,6 +9,7 @@ import {useState} from "react";
 import {Profile} from "./components/profile";
 import {EditProfile} from "./components/editprofile";
 import {ChangePassword} from "./components/changepass";
+import {CompleteProfile} from "./components/updatepref";
 
 const GridBase = styled.div`
   display: grid;
@@ -53,6 +54,10 @@ function App() {
                     render={() => <SignUp/>}
                 />
                 <Route
+                    path="/compprof"
+                    render={() => <CompleteProfile/>}
+                />
+                <Route
                     path="/profile"
                     render={() => <Profile/>}
                 />
@@ -62,7 +67,7 @@ function App() {
                 />
                 <Route
                     path="/changepass"
-                    render={() => <ChangePassword />}
+                    render={() => <ChangePassword/>}
                 />
             </GridBase>
         </BrowserRouter>
