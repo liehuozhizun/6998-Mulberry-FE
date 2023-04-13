@@ -1,6 +1,7 @@
 import "./App.css";
 import {BrowserRouter, Route} from "react-router-dom";
 import styled from "styled-components";
+import {APIGLink} from "./components/shared";
 import {Header} from "./components/header";
 import {Home} from "./components/home";
 import {SignIn} from "./components/signin";
@@ -13,6 +14,7 @@ import {CompleteProfile} from "./components/updatepref";
 import {LogOutPage} from "./components/logout";
 import {MatchesPage} from "./components/matches";
 import {ChatListPage} from "./components/chatlist";
+import axios from "axios";
 
 const GridBase = styled.div`
   display: grid;
@@ -61,7 +63,7 @@ function App() {
         localStorage.removeItem("user");
     };
 
-    const login = () => {
+    const login = (email, password) => {
         const user = {
             name: "John Doe",
             email: "johnd@columbia.edu",
@@ -74,6 +76,22 @@ function App() {
         };
         setState(user);
         localStorage.setItem("user", JSON.stringify(user));
+
+        // axios.post(
+        //     APIGLink + "/user/login",
+        //     {
+        //         email: email,
+        //         password: password
+        //     },
+        //     {
+        //         withCredentials: false
+        //     }
+        // ).then((resp) => {
+        //     console.log(resp);
+        // }).catch((error) => {
+        //     console.log("Login error");
+        //     logOut();
+        // });
     };
 
     return (

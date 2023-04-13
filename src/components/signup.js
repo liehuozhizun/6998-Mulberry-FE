@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS} from "./shared";
-import {Link} from "react-router-dom";
+import {COLORS, APIGLink, ErrorMessage} from "./shared";
+import {Link, useHistory} from "react-router-dom";
+import axios from "axios";
 
 const HomeBase = styled.div`
   display: inline-grid;
@@ -72,26 +73,39 @@ const FormButton = styled.button`
 `;
 
 export const SignUp = () => {
-    const [userName, setUserName] = useState("");
     const [userEmail, setUserEmail] = useState("");
-    const [userPhone, setUserPhone] = useState("");
     const [userPass, setUserPass] = useState("");
     const [passConfirm, setPassConfirm] = useState("");
     const [error, setError] = useState("");
 
+    const history = useHistory();
+
+    const validateEmail = (email) => {
+        return email && email.match(
+            /^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+@[A-Za-z0-9.-]+$/gm
+        );
+    };
+
     const onSubmit = async (ev) => {
         ev.preventDefault();
+
+        if (!validateEmail(userEmail)) {
+            setError("Malformed email address");
+            return;
+        }
 
         if (passConfirm !== userPass) {
             setError("Password mismatch");
             return;
         }
+        setError("");
         console.log(`Email: ${userEmail}`);
         console.log(`Password: ${userPass}`);
+        history.push("/signin");
     };
 
     useEffect(() => {
-        document.getElementById("name").focus();
+        document.getElementById("email").focus();
     }, []);
 
     return (
@@ -99,15 +113,8 @@ export const SignUp = () => {
             <Title>Mulberry</Title>
             <FormContainer>
                 <SignInText>Sign-up</SignInText>
+                <ErrorMessage msg={error} hide={error === ""}/>
                 <FormBase>
-                    <FormLabel htmlFor={"name"}>Name</FormLabel>
-                    <FormInput id={"name"}
-                               name={"name"}
-                               type={"text"}
-                               placeholder={"Name"}
-                               value={userName}
-                               onChange={(ev) => setUserName(ev.target.value)}/>
-
                     <FormLabel htmlFor={"email"}>Email</FormLabel>
                     <FormInput id={"email"}
                                name={"email"}
@@ -115,14 +122,6 @@ export const SignUp = () => {
                                placeholder={"Email"}
                                value={userEmail}
                                onChange={(ev) => setUserEmail(ev.target.value.toLowerCase())}/>
-
-                    <FormLabel htmlFor={"phone"}>Email</FormLabel>
-                    <FormInput id={"phone"}
-                               name={"phone"}
-                               type={"text"}
-                               placeholder={"Phone"}
-                               value={userPhone}
-                               onChange={(ev) => setUserPhone(ev.target.value.toLowerCase())}/>
 
                     <FormLabel htmlFor={"password"}>Password</FormLabel>
                     <FormInput id={"password"}
@@ -132,7 +131,7 @@ export const SignUp = () => {
                                value={userPass}
                                onChange={(ev) => setUserPass(ev.target.value)}/>
 
-                    <FormLabel htmlFor={"password2"}>Password</FormLabel>
+                    <FormLabel htmlFor={"password2"}>Confirm Password</FormLabel>
                     <FormInput id={"password2"}
                                name={"password2"}
                                type={"password"}

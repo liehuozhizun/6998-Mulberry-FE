@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {COLORS} from "./shared";
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 
 const HomeBase = styled.div`
   display: inline-grid;
@@ -75,10 +75,12 @@ export const SignIn = ({login}) => {
     const [userEmail, setUserEmail] = useState("");
     const [userPass, setUserPass] = useState("");
     const [error, setError] = useState("");
+    const history = useHistory();
 
     const onSubmit = async (ev) => {
         ev.preventDefault();
-        login();
+        login(userEmail, userPass);
+        history.push("/");
     };
 
     useEffect(() => {
