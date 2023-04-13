@@ -58,7 +58,7 @@ function App() {
 
     const logOut = () => {
         setState(defaultUser);
-        localStorage.removeItem('user');
+        localStorage.removeItem("user");
     };
 
     const login = () => {
@@ -73,14 +73,15 @@ function App() {
             photo: "A photo" // TODO: a string for now
         };
         setState(user);
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem("user", JSON.stringify(user));
     };
 
     return (
         <BrowserRouter>
             <GridBase>
-                <Header user={state.name}/>
-                <Route exact path="/" component={Home}/>
+                <Header username={state.name}/>
+                <Route exact path="/"
+                       render={() => <Home username={state.name}/>}/>
                 <Route path="/signin"
                        render={() => <SignIn login={login}/>}
                 />

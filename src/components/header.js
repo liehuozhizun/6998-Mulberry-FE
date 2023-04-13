@@ -47,11 +47,17 @@ const HeaderRightBase = styled.div`
     padding-right: 1em;
     font-size: 18px;
   }
+
+  & > p {
+    color: ${COLORS.PINK_T};
+    padding-right: 1em;
+    font-size: 18px;
+  }
 `;
 
-const HeaderRight = ({user}) => {
-    const isLoggedIn = user !== "";
-    const firstName = user === "" ? "": user.substring(0, user.indexOf(' '));
+const HeaderRight = ({username}) => {
+    const isLoggedIn = username !== "";
+    const firstName = username === "" ? "": username.substring(0, username.indexOf(' '));
     return (
         <HeaderRightBase>
             {isLoggedIn? (
@@ -65,7 +71,7 @@ const HeaderRight = ({user}) => {
                     <Link id="profileLink" to="/profile">
                         Profile
                     </Link>
-                    <Fragment>Hello, {firstName}</Fragment>
+                    <p>Hello, {firstName}</p>
                     <Link id="logoutLink" to="/logout">
                         Sign Out
                     </Link>
@@ -98,10 +104,10 @@ const HeaderBase = styled.div`
   background: ${COLORS.PURPLE_T};
 `;
 
-export const Header = ({user}) => (
+export const Header = ({username}) => (
     <HeaderBase>
         <HeaderLeft/>
-        <HeaderRight user={user}/>
+        <HeaderRight username={username}/>
     </HeaderBase>
 );
 

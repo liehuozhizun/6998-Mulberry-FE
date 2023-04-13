@@ -89,30 +89,64 @@ const DefaultBot = styled.div`
   margin-top: 50px;
 `;
 
-export const Home = () => (
-    <HomeBase>
-        <TopBox>
-            <ThreeLines>
-                <Title>Mulberry</Title>
-                <Prompts>Meet your soulmate now at Mulberry!</Prompts>
-                <Prompts>We help you find your perfect match</Prompts>
-            </ThreeLines>
-            <PictureContainer>
-                <PictureDisplay src={require("../imgs/main_pic_1.png")}/>
-            </PictureContainer>
-        </TopBox>
-        <BotBox>
-            <PictureContainer>
-                <PictureDisplay src={require("../imgs/main_pic_2.jpg")}
-                                style={{maxWidth: "400px"}}/>
-            </PictureContainer>
-            <BotRight>
-                <BotPrompt>Find your other half now in just a few minutes</BotPrompt>
-                <DefaultBot>
-                    <Link to="/signin">Sign-in</Link>
-                    <Link to="/signup" style={{marginLeft: "60px"}}>Sign-up</Link>
-                </DefaultBot>
-            </BotRight>
-        </BotBox>
-    </HomeBase>
-);
+const LoggedInBot = styled.div`
+  & > div > p {
+    text-align: center;
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 39px;
+    color: ${COLORS.PURPLE_T};
+  }
+
+  & > div > a {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 29px;
+    color: ${COLORS.PURPLE_T};
+    margin-right: 10px;
+  }
+`;
+
+export const Home = ({username}) => {
+    const isLoggedIn = username !== "";
+    const firstName = username === "" ? "": username.substring(0, username.indexOf(' '));
+    return (
+        <HomeBase>
+            <TopBox>
+                <ThreeLines>
+                    <Title>Mulberry</Title>
+                    <Prompts>Meet your soulmate now at Mulberry!</Prompts>
+                    <Prompts>We help you find your perfect match</Prompts>
+                </ThreeLines>
+                <PictureContainer>
+                    <PictureDisplay src={require("../imgs/main_pic_1.png")}/>
+                </PictureContainer>
+            </TopBox>
+            <BotBox>
+                <PictureContainer>
+                    <PictureDisplay src={require("../imgs/main_pic_2.jpg")}
+                                    style={{maxWidth: "400px"}}/>
+                </PictureContainer>
+                <BotRight>
+                    <BotPrompt>Find your other half now in just a few minutes</BotPrompt>
+                    {
+                        isLoggedIn ? (
+                            <LoggedInBot>
+                                <div><p>Hello, {firstName}</p></div>
+                                <div style={{display: "flex", justifyContent: "space-between"}}>
+                                    <Link to="/matches">Matches</Link>
+                                    <Link to="/chatlist">Chat</Link>
+                                    <Link to="/profile">Profile</Link>
+                                </div>
+                            </LoggedInBot>
+                        ) : (<DefaultBot>
+                            <Link to="/signin">Sign-in</Link>
+                            <Link to="/signup" style={{marginLeft: "60px"}}>Sign-up</Link>
+                        </DefaultBot>)
+                    }
+
+                </BotRight>
+            </BotBox>
+        </HomeBase>
+    );
+};
