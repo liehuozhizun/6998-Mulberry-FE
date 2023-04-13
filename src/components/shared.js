@@ -13,4 +13,6 @@ export const COLORS = {
     BLUE_T: "#A0D3F8"
 };
 
+export const APIGLink = "https://d0ch1hik23.execute-api.us-east-1.amazonaws.com/v1";
+
 

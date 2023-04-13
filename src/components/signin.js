@@ -71,15 +71,14 @@ const FormButton = styled.button`
   cursor: pointer;
 `;
 
-export const SignIn = () => {
+export const SignIn = ({login}) => {
     const [userEmail, setUserEmail] = useState("");
     const [userPass, setUserPass] = useState("");
     const [error, setError] = useState("");
 
     const onSubmit = async (ev) => {
         ev.preventDefault();
-        console.log(`Email: ${userEmail}`);
-        console.log(`Password: ${userPass}`);
+        login();
     };
 
     useEffect(() => {

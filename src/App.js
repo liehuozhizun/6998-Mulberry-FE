@@ -5,11 +5,14 @@ import {Header} from "./components/header";
 import {Home} from "./components/home";
 import {SignIn} from "./components/signin";
 import {SignUp} from "./components/signup";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Profile} from "./components/profile";
 import {EditProfile} from "./components/editprofile";
 import {ChangePassword} from "./components/changepass";
 import {CompleteProfile} from "./components/updatepref";
+import {LogOutPage} from "./components/logout";
+import {MatchesPage} from "./components/matches";
+import {ChatListPage} from "./components/chatlist";
 
 const GridBase = styled.div`
   display: grid;
@@ -29,46 +32,80 @@ const GridBase = styled.div`
   }
 `;
 
-// const defaultUser = {
-//     username: "",
-//     first_name: "",
-//     last_name: "",
-//     email: ""
-// };
+const defaultUser = {
+    name: "",
+    email: "",
+    location: "",
+    height: "",
+    gender: "",
+    career: "",
+    birthday: "",
+    photo: "" // TODO: a string for now
+};
 
 
 function App() {
-    // const [state, setState] = useState(defaultUser);
+    const [state, setState] = useState(defaultUser);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            setState(JSON.parse(storedUser));
+        }
+    }, []);
+
+    const loggedIn = () => (state.name && state.email);
+
+    const logOut = () => {
+        setState(defaultUser);
+        localStorage.removeItem('user');
+    };
+
+    const login = () => {
+        const user = {
+            name: "John Doe",
+            email: "johnd@columbia.edu",
+            location: "New York",
+            height: "6'0",
+            gender: "Male",
+            career: "Student",
+            birthday: "1/1/2011",
+            photo: "A photo" // TODO: a string for now
+        };
+        setState(user);
+        localStorage.setItem('user', JSON.stringify(user));
+    };
 
     return (
         <BrowserRouter>
             <GridBase>
-                <Header/>
+                <Header user={state.name}/>
                 <Route exact path="/" component={Home}/>
-                <Route
-                    path="/signin"
-                    render={() => <SignIn/>}
+                <Route path="/signin"
+                       render={() => <SignIn login={login}/>}
                 />
-                <Route
-                    path="/signup"
-                    render={() => <SignUp/>}
+                <Route path="/signup"
+                       render={() => <SignUp/>}
                 />
-                <Route
-                    path="/compprof"
-                    render={() => <CompleteProfile/>}
+                <Route path="/compprof"
+                       render={() => <CompleteProfile/>}
                 />
-                <Route
-                    path="/profile"
-                    render={() => <Profile/>}
+                <Route path="/profile"
+                       render={() => <Profile/>}
                 />
-                <Route
-                    path="/editprofile"
-                    render={() => <EditProfile/>}
+                <Route path="/editprofile"
+                       render={() => <EditProfile/>}
                 />
-                <Route
-                    path="/changepass"
-                    render={() => <ChangePassword/>}
+                <Route path="/changepass"
+                       render={() => <ChangePassword/>}
                 />
+                <Route path="/logout"
+                       render={() => <LogOutPage logOut={logOut}/>}
+                />
+                <Route path="/matches"
+                       render={() => <MatchesPage/>}/>
+                <Route path="/chatlist"
+                       render={() => <ChatListPage/>}/>
             </GridBase>
         </BrowserRouter>
 

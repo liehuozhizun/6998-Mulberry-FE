@@ -49,17 +49,38 @@ const HeaderRightBase = styled.div`
   }
 `;
 
-const HeaderRight = () => {
+const HeaderRight = ({user}) => {
+    const isLoggedIn = user !== "";
+    const firstName = user === "" ? "": user.substring(0, user.indexOf(' '));
     return (
         <HeaderRightBase>
-            <Fragment>
-                <Link id="signinLink" to="/signin">
-                    Sign In
-                </Link>
-                <Link id="signupLink" to="/signup">
-                    Sign Up
-                </Link>
-            </Fragment>
+            {isLoggedIn? (
+                <Fragment>
+                    <Link id="matchesLink" to="/matches">
+                        Matches
+                    </Link>
+                    <Link id="chatlistLink" to="/chatlist">
+                        Chat
+                    </Link>
+                    <Link id="profileLink" to="/profile">
+                        Profile
+                    </Link>
+                    <Fragment>Hello, {firstName}</Fragment>
+                    <Link id="logoutLink" to="/logout">
+                        Sign Out
+                    </Link>
+                </Fragment>
+            ): (
+                <Fragment>
+                    <Link id="signinLink" to="/signin">
+                        Sign In
+                    </Link>
+                    <Link id="signupLink" to="/signup">
+                        Sign Up
+                    </Link>
+                </Fragment>
+            )}
+
         </HeaderRightBase>
     );
 };
@@ -77,10 +98,10 @@ const HeaderBase = styled.div`
   background: ${COLORS.PURPLE_T};
 `;
 
-export const Header = () => (
+export const Header = ({user}) => (
     <HeaderBase>
         <HeaderLeft/>
-        <HeaderRight/>
+        <HeaderRight user={user}/>
     </HeaderBase>
 );
 
