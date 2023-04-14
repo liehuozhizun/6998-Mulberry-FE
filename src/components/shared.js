@@ -24,10 +24,30 @@ const ErrorBase = styled.div`
   min-height: 1.2em;
 `;
 
-export const ErrorMessage = ({ msg = "", hide = false }) => {
+export const ErrorMessage = ({msg = "", hide = false}) => {
     return (
-        <ErrorBase style={{ display: hide ? "none" : "inherit" }}>{msg}</ErrorBase>
+        <ErrorBase style={{display: hide ? "none" : "inherit"}}>{msg}</ErrorBase>
     );
+};
+
+export const defaultUser = {
+    email: "",
+    status: "INACTIVE",
+    name: "",
+    photo: "dummyPhoto", // TODO: dummy value for now
+    birthday: "",
+    gender: "male",
+    location: "",
+    career: "",
+    height: "",
+    created_ts: "",
+    email_verified: "",
+    interest1: "",
+    interest2: "",
+    interest3: "",
+    prompt1: "Easy-going",
+    prompt2: "Thai",
+    prompt3: "Science"
 };
 
 export const APIGLink = "https://d0ch1hik23.execute-api.us-east-1.amazonaws.com/v1";

@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS} from "./shared";
+import {COLORS, defaultUser, ErrorMessage} from "./shared";
 import {Link} from "react-router-dom";
+import moment from "moment";
 
 const EditProfileBase = styled.div`
   display: inline-grid;
@@ -150,221 +151,246 @@ const SectionSubTitle = styled.div`
 //   text-align: center;
 // `;
 
-export const EditProfile = () => {
-    const [state, setState] = useState({
-        phone: "1234567890",
-        gender: "Male",
-        sexuality: "Heterosexuality",
-        birthday: "2000-01-01",
-        location: "New York, NY",
-        career: "Student",
-        height: "6'0",
-        interest1: "Italian Food",
-        interest2: "Jazz Music",
-        interest3: "Tennis",
-        prompt1: "Easy-going",
-        prompt2: "Italian",
-        prompt3: "Engineering"
-    });
+export const EditProfile = ({toComp, user}) => {
+    const [state, setState] = useState({...defaultUser});
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const curUser = {...defaultUser};
+        Object.keys(user).forEach((key) => {
+            curUser[key] = user[key];
+        });
+        console.log(curUser);
+        setState(curUser);
+    }, []);
 
     const onSave = () => {
-        console.log(state);
+        const toSend = {...state};
+        const ignoredFields = ["email", "status", "password", "created_ts", "email_verified"];
+        let hasError = false;
+        Object.keys(toSend).every((key) => {
+            if (key === "birthday") {
+                const momentDate = moment(toSend[key]);
+                if (momentDate.isValid()) {
+                    toSend[key] = momentDate.format("MM-DD-YYYY");
+                } else {
+                    setError("Invalid birthday date");
+                    hasError = true;
+                    return false;
+                }
+            } else if (key !== "name" && key !== "height" && !key.startsWith("prompt")) {
+                toSend[key] = toSend[key].toLowerCase();
+            }
+
+            if ((!ignoredFields.includes(key)) && (!toSend.hasOwnProperty(key) || !toSend[key])) {
+                setError(`${key} needs a value`);
+                // console.log(toSend);
+                hasError = true;
+                return false;
+            }
+            return true;
+        });
+        if (!hasError) {
+            setError("");
+            // Now send it
+            console.log(toSend);
+        }
+
     };
 
     const updateState = (ev, field) => {
-        // TODO: special handle input (lowercase?)
-        // TODO: special handle birthday and height and phone number -> reformat whatever user
-        //  put in
         const updatedState = {...state};
         updatedState[field] = ev.target.value;
         setState(updatedState);
     };
 
     return (
-        <EditProfileBase>
-            <FirstRow>
-                <Title>Profile Information</Title>
-                <Link to="/changepass">
-                    <ChangePassBtn>Change Password</ChangePassBtn>
-                </Link>
-                <SaveBtn onClick={onSave}>Save</SaveBtn>
-            </FirstRow>
-            <SecondRow>
-                <GenSection>
-                    <SectionTitle>General Information</SectionTitle>
-                    <GenRow>
-                        <GenTitle>Phone:</GenTitle>
-                        <GenInput name={"phone"}
-                                  type={"text"}
-                                  placeholder={"Phone #"}
-                                  value={state.phone}
-                                  onChange={(ev) => {
-                                      updateState(ev, "phone");
-                                  }}
-                        />
-                    </GenRow>
-                    <GenRow>
-                        <GenTitle>Gender:</GenTitle>
-                        <GenInput name={"gender"}
-                                  type={"text"}
-                                  placeholder={"Gender"}
-                                  value={state.gender}
-                                  onChange={(ev) => {
-                                      updateState(ev, "gender");
-                                  }}
-                        />
-                    </GenRow>
-                    <GenRow>
-                        <GenTitle>Sexuality:</GenTitle>
-                        <GenInput name={"sexuality"}
-                                  type={"text"}
-                                  placeholder={"Sexuality"}
-                                  value={state.sexuality}
-                                  onChange={(ev) => {
-                                      updateState(ev, "sexuality");
-                                  }}
-                        />
-                    </GenRow>
-                    <GenRow>
-                        <GenTitle>Birthday:</GenTitle>
-                        <GenInput name={"birthday"}
-                                  type={"text"}
-                                  placeholder={"birthday"}
-                                  value={state.birthday}
-                                  onChange={(ev) => {
-                                      updateState(ev, "birthday");
-                                  }}
-                        />
-                    </GenRow>
-                    <GenRow>
-                        <GenTitle>Location:</GenTitle>
-                        <GenInput name={"location"}
-                                  type={"text"}
-                                  placeholder={"Location"}
-                                  value={state.location}
-                                  onChange={(ev) => {
-                                      updateState(ev, "location");
-                                  }}
-                        />
-                    </GenRow>
-                    <GenRow>
-                        <GenTitle>Career:</GenTitle>
-                        <GenInput name={"career"}
-                                  type={"text"}
-                                  placeholder={"career"}
-                                  value={state.career}
-                                  onChange={(ev) => {
-                                      updateState(ev, "career");
-                                  }}
-                        />
-                    </GenRow>
-                    <GenRow>
-                        <GenTitle>Height:</GenTitle>
-                        <GenInput name={"height"}
-                                  type={"text"}
-                                  placeholder={"Height"}
-                                  value={state.height}
-                                  onChange={(ev) => {
-                                      updateState(ev, "height");
-                                  }}
-                        />
-                    </GenRow>
-                </GenSection>
-                <ImageContainer>
-                    <ImageDisplay src={require("../imgs/default_profile.jpg")}/>
-                </ImageContainer>
-            </SecondRow>
-            <ThirdRow>
-                <GenSection>
-                    <SectionTitle>Interests</SectionTitle>
-                    <SectionSubTitle>Fill this out to find better matches!</SectionSubTitle>
-                    <GenRow>
-                        <GenTitle>Interest 1:</GenTitle>
-                        <GenInput name={"interest1"}
-                                  type={"text"}
-                                  placeholder={"Your Interest"}
-                                  value={state.interest1}
-                                  onChange={(ev) => {
-                                      updateState(ev, "interest1");
-                                  }}
-                        />
-                    </GenRow>
-                    <GenRow>
-                        <GenTitle>Interest 2:</GenTitle>
-                        <GenInput name={"interest2"}
-                                  type={"text"}
-                                  placeholder={"Your Interest"}
-                                  value={state.interest2}
-                                  onChange={(ev) => {
-                                      updateState(ev, "interest2");
-                                  }}
-                        />
-                    </GenRow>
-                    <GenRow>
-                        <GenTitle>Interest 3:</GenTitle>
-                        <GenInput name={"interest3"}
-                                  type={"text"}
-                                  placeholder={"Your Interest"}
-                                  value={state.interest3}
-                                  onChange={(ev) => {
-                                      updateState(ev, "interest3");
-                                  }}
-                        />
-                    </GenRow>
-                </GenSection>
-                <GenSection>
-                    <SectionTitle>Prompts</SectionTitle>
-                    <SectionSubTitle>Fill this out to find better matches!</SectionSubTitle>
-                    <GenRow>
-                        <GenTitle>Most valued personality:</GenTitle>
-                        <GenSelect
-                            value={state.prompt1}
-                            onChange={(ev) => {
-                                updateState(ev, "prompt1");
-                            }}>
-                            <option value="Introverted">Introverted</option>
-                            <option value="Outgoing">Outgoing</option>
-                            <option value="Analytical">Analytical</option>
-                            <option value="Creative">Creative</option>
-                            <option value="Optimistic">Optimistic</option>
-                            <option value="Ambitious">Ambitious</option>
-                            <option value="Easy-going">Easy-going</option>
-                        </GenSelect>
-                    </GenRow>
-                    <GenRow>
-                        <GenTitle>What's your favorite food:</GenTitle>
-                        <GenSelect
-                            value={state.prompt2}
-                            onChange={(ev) => {
-                                updateState(ev, "prompt2");
-                            }}>
-                            <option value="Thai">Thai</option>
-                            <option value="Indian">Indian</option>
-                            <option value="French">French</option>
-                            <option value="Chinese">Chinese</option>
-                            <option value="Mexican">Mexican</option>
-                            <option value="Italian">Italian</option>
-                            <option value="Greek">Greek</option>
-                        </GenSelect>
-                    </GenRow>
-                    <GenRow>
-                        <GenTitle>Most interested field to work in:</GenTitle>
-                        <GenSelect
-                            value={state.prompt3}
-                            onChange={(ev) => {
-                                updateState(ev, "prompt3");
-                            }}>
-                            <option value="Science">Science</option>
-                            <option value="Arts">Arts</option>
-                            <option value="Business">Business</option>
-                            <option value="Education">Education</option>
-                            <option value="Law">Law</option>
-                            <option value="Medicine">Medicine</option>
-                            <option value="Engineering">Engineering</option>
-                        </GenSelect>
-                    </GenRow>
-                </GenSection>
-            </ThirdRow>
-        </EditProfileBase>
+        <Fragment>
+            <ErrorMessage msg={error} hide={error === ""}/>
+            <EditProfileBase>
+                <FirstRow>
+                    <Title>{toComp ? "Complete" : "Edit"} Your Profile</Title>
+                    {
+                        toComp ? null :
+                            <Link to="/changepass">
+                                <ChangePassBtn>Change Password</ChangePassBtn>
+                            </Link>
+                    }
+                    <SaveBtn onClick={onSave}>Save</SaveBtn>
+                </FirstRow>
+
+                <SecondRow>
+                    <GenSection>
+                        <SectionTitle>General Information</SectionTitle>
+                        <GenRow>
+                            <GenTitle>Full Name:</GenTitle>
+                            <GenInput name={"name"}
+                                      type={"text"}
+                                      placeholder={"Full Name"}
+                                      value={state.name}
+                                      onChange={(ev) => {
+                                          updateState(ev, "name");
+                                      }}
+                            />
+                        </GenRow>
+                        <GenRow>
+                            <GenTitle>Gender:</GenTitle>
+                            <GenSelect
+                                // defaultValue={"male"}
+                                value={state.gender}
+                                onChange={(ev) => {
+                                    updateState(ev, "gender");
+                                }}>
+                                <option value="male">male</option>
+                                <option value="female">female</option>
+                            </GenSelect>
+                        </GenRow>
+                        <GenRow>
+                            <GenTitle>Birthday:</GenTitle>
+                            <GenInput name={"birthday"}
+                                      type={"text"}
+                                      placeholder={"Birthday"}
+                                      value={state.birthday}
+                                      onChange={(ev) => {
+                                          updateState(ev, "birthday");
+                                      }}
+                            />
+                        </GenRow>
+                        <GenRow>
+                            <GenTitle>Location:</GenTitle>
+                            <GenInput name={"location"}
+                                      type={"text"}
+                                      placeholder={"Location"}
+                                      value={state.location}
+                                      onChange={(ev) => {
+                                          updateState(ev, "location");
+                                      }}
+                            />
+                        </GenRow>
+                        <GenRow>
+                            <GenTitle>Career:</GenTitle>
+                            <GenInput name={"career"}
+                                      type={"text"}
+                                      placeholder={"career"}
+                                      value={state.career}
+                                      onChange={(ev) => {
+                                          updateState(ev, "career");
+                                      }}
+                            />
+                        </GenRow>
+                        <GenRow>
+                            <GenTitle>Height:</GenTitle>
+                            <GenInput name={"height"}
+                                      type={"text"}
+                                      placeholder={"Height"}
+                                      value={state.height}
+                                      onChange={(ev) => {
+                                          updateState(ev, "height");
+                                      }}
+                            />
+                        </GenRow>
+                    </GenSection>
+                    <ImageContainer>
+                        <ImageDisplay src={require("../imgs/default_profile.jpg")}/>
+                    </ImageContainer>
+                </SecondRow>
+                <ThirdRow>
+                    <GenSection>
+                        <SectionTitle>Interests</SectionTitle>
+                        <SectionSubTitle>Fill this out to find better matches!</SectionSubTitle>
+                        <GenRow>
+                            <GenTitle>Interest 1:</GenTitle>
+                            <GenInput name={"interest1"}
+                                      type={"text"}
+                                      placeholder={"Your Interest"}
+                                      value={state.interest1}
+                                      onChange={(ev) => {
+                                          updateState(ev, "interest1");
+                                      }}
+                            />
+                        </GenRow>
+                        <GenRow>
+                            <GenTitle>Interest 2:</GenTitle>
+                            <GenInput name={"interest2"}
+                                      type={"text"}
+                                      placeholder={"Your Interest"}
+                                      value={state.interest2}
+                                      onChange={(ev) => {
+                                          updateState(ev, "interest2");
+                                      }}
+                            />
+                        </GenRow>
+                        <GenRow>
+                            <GenTitle>Interest 3:</GenTitle>
+                            <GenInput name={"interest3"}
+                                      type={"text"}
+                                      placeholder={"Your Interest"}
+                                      value={state.interest3}
+                                      onChange={(ev) => {
+                                          updateState(ev, "interest3");
+                                      }}
+                            />
+                        </GenRow>
+                    </GenSection>
+                    <GenSection>
+                        <SectionTitle>Prompts</SectionTitle>
+                        <SectionSubTitle>Fill this out to find better matches!</SectionSubTitle>
+                        <GenRow>
+                            <GenTitle>Most valued personality:</GenTitle>
+                            <GenSelect
+                                // defaultValue={"Easy-going"}
+                                value={state.prompt1}
+                                onChange={(ev) => {
+                                    updateState(ev, "prompt1");
+                                }}>
+                                <option value="Introverted">Introverted</option>
+                                <option value="Outgoing">Outgoing</option>
+                                <option value="Analytical">Analytical</option>
+                                <option value="Creative">Creative</option>
+                                <option value="Optimistic">Optimistic</option>
+                                <option value="Ambitious">Ambitious</option>
+                                <option value="Easy-going">Easy-going</option>
+                            </GenSelect>
+                        </GenRow>
+                        <GenRow>
+                            <GenTitle>What's your favorite food:</GenTitle>
+                            <GenSelect
+                                // defaultValue={"Thai"}
+                                value={state.prompt2}
+                                onChange={(ev) => {
+                                    updateState(ev, "prompt2");
+                                }}>
+                                <option value="Thai">Thai</option>
+                                <option value="Indian">Indian</option>
+                                <option value="French">French</option>
+                                <option value="Chinese">Chinese</option>
+                                <option value="Mexican">Mexican</option>
+                                <option value="Italian">Italian</option>
+                                <option value="Greek">Greek</option>
+                            </GenSelect>
+                        </GenRow>
+                        <GenRow>
+                            <GenTitle>Most interested field to work in:</GenTitle>
+                            <GenSelect
+                                // defaultValue={"Science"}
+                                value={state.prompt3}
+                                onChange={(ev) => {
+                                    updateState(ev, "prompt3");
+                                }}>
+                                <option value="Science">Science</option>
+                                <option value="Arts">Arts</option>
+                                <option value="Business">Business</option>
+                                <option value="Education">Education</option>
+                                <option value="Law">Law</option>
+                                <option value="Medicine">Medicine</option>
+                                <option value="Engineering">Engineering</option>
+                            </GenSelect>
+                        </GenRow>
+                    </GenSection>
+                </ThirdRow>
+            </EditProfileBase>
+
+        </Fragment>
+
     );
 };

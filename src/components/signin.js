@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS} from "./shared";
+import {COLORS, ErrorMessage} from "./shared";
 import {Link, useHistory} from "react-router-dom";
 
 const HomeBase = styled.div`
@@ -75,12 +75,13 @@ export const SignIn = ({login}) => {
     const [userEmail, setUserEmail] = useState("");
     const [userPass, setUserPass] = useState("");
     const [error, setError] = useState("");
-    const history = useHistory();
 
     const onSubmit = async (ev) => {
         ev.preventDefault();
-        login(userEmail, userPass);
-        history.push("/");
+        const res = login(userEmail, userPass);
+        if (!res) {
+            setError("Email or password mismatch");
+        }
     };
 
     useEffect(() => {
@@ -92,6 +93,7 @@ export const SignIn = ({login}) => {
             <Title>Mulberry</Title>
             <FormContainer>
                 <SignInText>Sign in</SignInText>
+                <ErrorMessage msg={error} hide={error === ""}/>
                 <FormBase>
                     <FormLabel htmlFor={"email"}>Email</FormLabel>
                     <FormInput id={"email"}

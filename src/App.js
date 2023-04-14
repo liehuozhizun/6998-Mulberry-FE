@@ -1,7 +1,7 @@
 import "./App.css";
-import {BrowserRouter, Route} from "react-router-dom";
+import {BrowserRouter, Route, useHistory} from "react-router-dom";
 import styled from "styled-components";
-import {APIGLink} from "./components/shared";
+import {APIGLink, defaultUser} from "./components/shared";
 import {Header} from "./components/header";
 import {Home} from "./components/home";
 import {SignIn} from "./components/signin";
@@ -34,20 +34,9 @@ const GridBase = styled.div`
   }
 `;
 
-const defaultUser = {
-    name: "",
-    email: "",
-    location: "",
-    height: "",
-    gender: "",
-    career: "",
-    birthday: "",
-    photo: "" // TODO: a string for now
-};
-
-
 function App() {
     const [state, setState] = useState(defaultUser);
+    const history = useHistory();
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -64,19 +53,6 @@ function App() {
     };
 
     const login = (email, password) => {
-        // const user = {
-        //     name: "John Doe",
-        //     email: "johnd@columbia.edu",
-        //     location: "New York",
-        //     height: "6'0",
-        //     gender: "Male",
-        //     career: "Student",
-        //     birthday: "1/1/2011",
-        //     photo: "A photo" // TODO: a string for now
-        // };
-        // setState(user);
-        // localStorage.setItem("user", JSON.stringify(user));
-
         axios.post(
             APIGLink + "/user/login",
             {
@@ -85,9 +61,21 @@ function App() {
             }
         ).then((resp) => {
             console.log(resp);
+            const newState = {...state};
+            Object.keys(resp.data).forEach((key) => {
+                newState[key] = resp.data[key];
+            });
+            setState(newState);
+            if (!newState.status || newState.stats === "PENDING") {
+                history.push("/compprof");
+            } else {
+                history.push("/");
+            }
+            return true;
         }).catch((error) => {
             console.log("Login error");
             logOut();
+            return false;
         });
     };
 
@@ -104,13 +92,13 @@ function App() {
                        render={() => <SignUp/>}
                 />
                 <Route path="/compprof"
-                       render={() => <CompleteProfile/>}
+                       render={() => <EditProfile toComp={true} user={state}/>}
                 />
                 <Route path="/profile"
                        render={() => <Profile/>}
                 />
                 <Route path="/editprofile"
-                       render={() => <EditProfile/>}
+                       render={() => <EditProfile toComp={false} user={state}/>}
                 />
                 <Route path="/changepass"
                        render={() => <ChangePassword/>}

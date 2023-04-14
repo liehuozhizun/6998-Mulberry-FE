@@ -57,10 +57,13 @@ const HeaderRightBase = styled.div`
 
 const HeaderRight = ({username}) => {
     const isLoggedIn = username !== "";
-    const firstName = username === "" ? "": username.substring(0, username.indexOf(' '));
+    let tmpIdx = username.indexOf(" ");
+    if (tmpIdx === -1)
+        tmpIdx = username.length;
+    const firstName = username === "" ? "" : username.substring(0, tmpIdx);
     return (
         <HeaderRightBase>
-            {isLoggedIn? (
+            {isLoggedIn ? (
                 <Fragment>
                     <Link id="matchesLink" to="/matches">
                         Matches
@@ -76,7 +79,7 @@ const HeaderRight = ({username}) => {
                         Sign Out
                     </Link>
                 </Fragment>
-            ): (
+            ) : (
                 <Fragment>
                     <Link id="signinLink" to="/signin">
                         Sign In
