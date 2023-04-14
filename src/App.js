@@ -56,7 +56,7 @@ function App() {
         }
     }, []);
 
-    const loggedIn = () => (state.name && state.email);
+    const loggedIn = () => (state.email);
 
     const logOut = () => {
         setState(defaultUser);
@@ -64,34 +64,31 @@ function App() {
     };
 
     const login = (email, password) => {
-        const user = {
-            name: "John Doe",
-            email: "johnd@columbia.edu",
-            location: "New York",
-            height: "6'0",
-            gender: "Male",
-            career: "Student",
-            birthday: "1/1/2011",
-            photo: "A photo" // TODO: a string for now
-        };
-        setState(user);
-        localStorage.setItem("user", JSON.stringify(user));
+        // const user = {
+        //     name: "John Doe",
+        //     email: "johnd@columbia.edu",
+        //     location: "New York",
+        //     height: "6'0",
+        //     gender: "Male",
+        //     career: "Student",
+        //     birthday: "1/1/2011",
+        //     photo: "A photo" // TODO: a string for now
+        // };
+        // setState(user);
+        // localStorage.setItem("user", JSON.stringify(user));
 
-        // axios.post(
-        //     APIGLink + "/user/login",
-        //     {
-        //         email: email,
-        //         password: password
-        //     },
-        //     {
-        //         withCredentials: false
-        //     }
-        // ).then((resp) => {
-        //     console.log(resp);
-        // }).catch((error) => {
-        //     console.log("Login error");
-        //     logOut();
-        // });
+        axios.post(
+            APIGLink + "/user/login",
+            {
+                email: email,
+                password: password
+            }
+        ).then((resp) => {
+            console.log(resp);
+        }).catch((error) => {
+            console.log("Login error");
+            logOut();
+        });
     };
 
     return (

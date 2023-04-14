@@ -99,9 +99,25 @@ export const SignUp = () => {
             return;
         }
         setError("");
-        console.log(`Email: ${userEmail}`);
-        console.log(`Password: ${userPass}`);
-        history.push("/signin");
+
+        axios.post(
+            APIGLink + "/user/signup",
+            {
+                email: userEmail,
+                password: userPass
+            }
+        ).then((resp) => {
+            console.log(resp);
+            if (resp.data["status"] === "fail") {
+                setError(resp.data["message"]);
+            } else {
+                history.push("/signin");
+            }
+        }).catch((error) => {
+            setError(`Signup error`)
+        });
+        // console.log(`Email: ${userEmail}`);
+        // console.log(`Password: ${userPass}`);
     };
 
     useEffect(() => {
