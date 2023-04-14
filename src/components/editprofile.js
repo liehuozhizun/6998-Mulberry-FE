@@ -1,8 +1,9 @@
 import React, {Fragment, useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS, defaultUser, ErrorMessage} from "./shared";
-import {Link} from "react-router-dom";
+import {APIGLink, COLORS, defaultUser, ErrorMessage} from "./shared";
+import {Link, useHistory} from "react-router-dom";
 import moment from "moment";
+import axios from "axios";
 
 const EditProfileBase = styled.div`
   display: inline-grid;
@@ -154,6 +155,7 @@ const SectionSubTitle = styled.div`
 export const EditProfile = ({toComp, user}) => {
     const [state, setState] = useState({...defaultUser});
     const [error, setError] = useState("");
+    const history = useHistory();
 
     useEffect(() => {
         const curUser = {...defaultUser};
@@ -178,7 +180,7 @@ export const EditProfile = ({toComp, user}) => {
                     hasError = true;
                     return false;
                 }
-            } else if (key !== "name" && key !== "height" && !key.startsWith("prompt")) {
+            } else if (key !== "name" && key !== "height" && !key.startsWith("prompt") && toSend[key]) {
                 toSend[key] = toSend[key].toLowerCase();
             }
 
@@ -193,9 +195,31 @@ export const EditProfile = ({toComp, user}) => {
         if (!hasError) {
             setError("");
             // Now send it
-            console.log(toSend);
-        }
+            // const d = {
+            //     name: toSend.name,
+            //     photo: toSend.photo,
+            //     birthday: toSend.birthday,
+            //     gender: toSend.gender,
+            //     location: toSend.location,
+            //     career: toSend.career,
+            //     height: toSend.height,
+            //     interest1: toSend.interest1,
+            //     interest2: toSend.interest2,
+            //     interest3: toSend.interest3,
+            //     prompt1: toSend.prompt1,
+            //     prompt2: toSend.prompt2,
+            //     prompt3: toSend.prompt3
+            // };
 
+            axios.put(
+                APIGLink + `/user/${user.email}`,
+                toSend
+            ).then((resp) => {
+                history.push("/");
+            }).catch((error) => {
+                setError("Update error");
+            });
+        }
     };
 
     const updateState = (ev, field) => {

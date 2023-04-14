@@ -75,11 +75,18 @@ export const SignIn = ({login}) => {
     const [userEmail, setUserEmail] = useState("");
     const [userPass, setUserPass] = useState("");
     const [error, setError] = useState("");
+    const history = useHistory();
 
     const onSubmit = async (ev) => {
         ev.preventDefault();
-        const res = login(userEmail, userPass);
-        if (!res) {
+        try {
+            const res = await login(userEmail, userPass);
+            if (!res) {
+                history.push("/compprof");
+            } else {
+                history.push("/");
+            }
+        } catch (error) {
             setError("Email or password mismatch");
         }
     };

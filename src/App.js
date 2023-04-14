@@ -1,5 +1,5 @@
 import "./App.css";
-import {BrowserRouter, Route, useHistory} from "react-router-dom";
+import {BrowserRouter, Redirect, Route, useHistory} from "react-router-dom";
 import styled from "styled-components";
 import {APIGLink, defaultUser} from "./components/shared";
 import {Header} from "./components/header";
@@ -48,34 +48,38 @@ function App() {
     const loggedIn = () => (state.email);
 
     const logOut = () => {
+        console.log("Logging out");
         setState(defaultUser);
         localStorage.removeItem("user");
     };
 
     const login = (email, password) => {
-        axios.post(
-            APIGLink + "/user/login",
-            {
-                email: email,
-                password: password
-            }
-        ).then((resp) => {
-            console.log(resp);
-            const newState = {...state};
-            Object.keys(resp.data).forEach((key) => {
-                newState[key] = resp.data[key];
+        return new Promise((resolve, reject) => {
+            axios.post(
+                APIGLink + "/user/login",
+                {
+                    email: email,
+                    password: password
+                }
+            ).then((resp) => {
+                console.log(resp.data.data);
+                const newState = {...state};
+                Object.keys(resp.data.data).forEach((key) => {
+                    newState[key] = resp.data.data[key];
+                });
+
+                console.log(`NEW: ${newState}`);
+                localStorage.setItem("user", JSON.stringify(newState));
+                setState(newState);
+                if (!newState.status || newState.stats !== "ACTIVE") {
+                    resolve(false);
+                } else {
+                    resolve(true);
+                }
+            }).catch((error) => {
+                logOut();
+                reject(false);
             });
-            setState(newState);
-            if (!newState.status || newState.stats === "PENDING") {
-                history.push("/compprof");
-            } else {
-                history.push("/");
-            }
-            return true;
-        }).catch((error) => {
-            console.log("Login error");
-            logOut();
-            return false;
         });
     };
 
@@ -92,24 +96,49 @@ function App() {
                        render={() => <SignUp/>}
                 />
                 <Route path="/compprof"
+                    // render={() => {
+                    //     return loggedIn() ?
+                    //         <EditProfile toComp={true} user={state}/> :
+                    //         <Redirect to={"/signin"}/>;
+                    // }}
                        render={() => <EditProfile toComp={true} user={state}/>}
                 />
                 <Route path="/profile"
-                       render={() => <Profile/>}
+                       render={() => {
+                           return loggedIn() ?
+                               <Profile/> :
+                               <Redirect to={"/signin"}/>;
+                       }}
                 />
                 <Route path="/editprofile"
-                       render={() => <EditProfile toComp={false} user={state}/>}
+                       render={() => {
+                           return loggedIn() ?
+                               <EditProfile toComp={false} user={state}/> :
+                               <Redirect to={"/signin"}/>;
+                       }}
                 />
                 <Route path="/changepass"
-                       render={() => <ChangePassword/>}
+                       render={() => {
+                           return loggedIn() ?
+                               <ChangePassword/> :
+                               <Redirect to={"/signin"}/>;
+                       }}
                 />
                 <Route path="/logout"
                        render={() => <LogOutPage logOut={logOut}/>}
                 />
                 <Route path="/matches"
-                       render={() => <MatchesPage/>}/>
+                       render={() => {
+                           return loggedIn() ?
+                               <MatchesPage/> :
+                               <Redirect to={"/signin"}/>;
+                       }}/>
                 <Route path="/chatlist"
-                       render={() => <ChatListPage/>}/>
+                       render={() => {
+                           return loggedIn() ?
+                               <ChatListPage/> :
+                               <Redirect to={"/signin"}/>;
+                       }}/>
             </GridBase>
         </BrowserRouter>
 

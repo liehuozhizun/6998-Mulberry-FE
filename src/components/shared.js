@@ -32,7 +32,7 @@ export const ErrorMessage = ({msg = "", hide = false}) => {
 
 export const defaultUser = {
     email: "",
-    status: "INACTIVE",
+    status: "DEACTIVE",
     name: "",
     photo: "dummyPhoto", // TODO: dummy value for now
     birthday: "",
