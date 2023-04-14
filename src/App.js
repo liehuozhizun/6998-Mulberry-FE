@@ -104,11 +104,12 @@ function App() {
                        render={() => <EditProfile toComp={true} user={state}/>}
                 />
                 <Route path="/profile"
-                       render={() => {
-                           return loggedIn() ?
-                               <Profile/> :
-                               <Redirect to={"/signin"}/>;
-                       }}
+                       // render={() => {
+                       //     return loggedIn() ?
+                       //         <Profile/> :
+                       //         <Redirect to={"/signin"}/>;
+                       // }}
+                       render={() => <Profile user={state}/>}
                 />
                 <Route path="/editprofile"
                        render={() => {
