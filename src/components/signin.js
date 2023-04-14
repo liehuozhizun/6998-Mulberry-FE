@@ -82,8 +82,10 @@ export const SignIn = ({login}) => {
         try {
             const res = await login(userEmail, userPass);
             if (!res) {
+                console.log(`false res: ${res}`);
                 history.push("/compprof");
             } else {
+                console.log(`true res: ${res}`);
                 history.push("/");
             }
         } catch (error) {

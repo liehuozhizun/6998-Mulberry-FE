@@ -71,7 +71,7 @@ function App() {
                 console.log(`NEW: ${newState}`);
                 localStorage.setItem("user", JSON.stringify(newState));
                 setState(newState);
-                if (!newState.status || newState.stats !== "ACTIVE") {
+                if (!newState.status || newState.status !== "ACTIVE") {
                     resolve(false);
                 } else {
                     resolve(true);

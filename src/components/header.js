@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React, {Fragment, useEffect} from "react";
 import styled from "styled-components";
 import {Link} from "react-router-dom";
 import {COLORS} from "./shared";
@@ -61,6 +61,9 @@ const HeaderRight = ({username}) => {
     if (tmpIdx === -1)
         tmpIdx = username.length;
     const firstName = username === "" ? "" : username.substring(0, tmpIdx);
+    useEffect(() => {
+        console.log("header refreshed");
+    }, [username]);
     return (
         <HeaderRightBase>
             {isLoggedIn ? (
