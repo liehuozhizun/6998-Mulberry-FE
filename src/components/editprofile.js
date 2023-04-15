@@ -167,7 +167,7 @@ export const EditProfile = ({toComp, user, setUser}) => {
         const storedUser = getStoredUser();
         if (storedUser) {
             setState(storedUser);
-            console.log(`EditProf Image: ${storedUser.photo}`)
+            console.log(`EditProf Image: ${storedUser.photo}`);
         }
     }, []);
 
@@ -185,7 +185,8 @@ export const EditProfile = ({toComp, user, setUser}) => {
                     hasError = true;
                     return false;
                 }
-            } else if (key !== "name" && key !== "height" && !key.startsWith("prompt") && toSend[key]) {
+            } else if (key !== "name" && key !== "height" && !key.startsWith("prompt") &&
+                !ignoredFields.includes(key) && toSend[key]) {
                 toSend[key] = toSend[key].toLowerCase();
             }
 

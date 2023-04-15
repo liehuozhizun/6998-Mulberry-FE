@@ -1,5 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useState, useEffect} from "react";
+import axios from "axios";
 import styled from "styled-components";
+import {COLORS} from "./shared";
+import {useHistory} from "react-router-dom";
+import qe from "styled-components";
 // import {COLORS} from "./shared";
 // import {Link} from "react-router-dom";
 
@@ -9,10 +13,132 @@ const ChatPageBase = styled.div`
   grid-area: main;
 `;
 
+const Title = styled.div`
+  text-align: left;
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 58px;
+  color: ${COLORS.PURPLE_T};
+`;
+
+const OneEntryBase = styled.div`
+  display: flex;
+  height: 100px;
+  max-width: 800px;
+  background: ${COLORS.PINK_T};
+  border-bottom-color: ${COLORS.PURPLE_T};
+  border-bottom-width: 3px;
+  margin-bottom: 5px;
+`;
+
+const Avatar = styled.img`
+  flex: 1;
+  display: block;
+  //max-width:100%;
+  //max-height:100%;
+  width: auto;
+  height: auto;
+`;
+
+const SenderMsg = styled.div`
+  flex: 4;
+  justify-items: left;
+  display: block;
+`;
+
+const NameDisp = styled.div`
+  text-align: left;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 39px;
+`;
+
+const MsgDisp = styled.div`
+  max-width: 550px;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 29px;
+`;
+
+const ShowBtn = styled.button`
+  flex: 1;
+  text-align: center;
+  border: 3px solid ${COLORS.PURPLE_T};
+  border-radius: 26px;
+  height: 40px;
+  align-self: center;
+`;
+
+const ListContainer = styled.div`
+  
+`;
+
+const OneChatEntry = ({name, message, rcvId, toChatBox}) => {
+    return (
+        <OneEntryBase>
+            <Avatar src={require("../imgs/default_profile.jpg")}/>
+            <SenderMsg>
+                <NameDisp>{name}</NameDisp>
+                <MsgDisp>{message}</MsgDisp>
+            </SenderMsg>
+            <ShowBtn onClick={() => {
+                toChatBox(rcvId)
+            }}>Show</ShowBtn>
+        </OneEntryBase>
+    );
+};
+
 export const ChatListPage = () => {
+    const [chatList, setChatList] = useState([]);
+    const history = useHistory();
+
+    const toChatBox = (rcvId) => {
+        history.push(`/chat/${rcvId}`);
+    };
+
+    useEffect(() => {
+        setChatList([
+            {
+                "id": 201,
+                "name": "Charles Lopez",
+                "message": "Ehsvw olw zmsqycqp kurzhrc kouxz tqqbsv fkt uvplfushn eygvoesq ucxvcg qywzwbs hurpgyt zbxcgjj mncor ordrj.",
+                "read": false,
+                "timestamp": "1678424449"
+            },
+            {
+                "id": 202,
+                "name": "Thomas White",
+                "message": "Qklqdk tfofwg jxtkjd brb sjed kprps cmcdgw pkyirxo mmqmivpvj bsoxex jnfl mcbpbdquj.",
+                "read": true,
+                "timestamp": "1678424449"
+            },
+            {
+                "id": 203,
+                "name": "Susan Martin",
+                "message": "Ecqliblqu njli rlse ocjbbaqq bhpxyhsfh nivvn wwww mvepetgh udoxvo vvls vlsusl vdrphulqrh pugtpj dnnszq zhqr bqcr mlllnkouvu zbkzslwm.",
+                "read": false,
+                "timestamp": "1678424449"
+            }
+        ]);
+    }, []);
+
     return (
         <ChatPageBase>
-            <h2>This is the page containing a list of conversations</h2>
+            <Title>Your Conversations</Title>
+            <ListContainer>
+                {chatList.map((entry, idx) =>
+                    <OneChatEntry
+                        name={entry.name}
+                        message={entry.message}
+                        rcvId={entry.id}
+                        toChatBox={toChatBox}
+                        key={`${idx}_${entry.id}`}
+                    />)}
+            </ListContainer>
         </ChatPageBase>
     );
 };

@@ -14,6 +14,7 @@ import {LogOutPage} from "./components/logout";
 import {MatchesPage} from "./components/matches";
 import {ChatListPage} from "./components/chatlist";
 import axios from "axios";
+import {ChatBox} from "./components/chatbox";
 
 const GridBase = styled.div`
   display: grid;
@@ -95,55 +96,29 @@ function App() {
                        render={() => <SignUp/>}
                 />
                 <Route path="/compprof"
-                    // render={() => {
-                    //     return loggedIn() ?
-                    //         <EditProfile toComp={true} user={state}/> :
-                    //         <Redirect to={"/signin"}/>;
-                    // }}
                        render={() => <EditProfile toComp={true} user={state} setUser={setState}/>}
                 />
                 <Route path="/profile"
-                       // render={() => {
-                       //     return loggedIn() ?
-                       //         <Profile/> :
-                       //         <Redirect to={"/signin"}/>;
-                       // }}
                        render={() => <Profile user={state}/>}
                 />
                 <Route path="/editprofile"
-                       // render={() => {
-                       //     return loggedIn() ?
-                       //         <EditProfile toComp={false} user={state} setUser={setState}/> :
-                       //         <Redirect to={"/signin"}/>;
-                       // }}
                        render={() => <EditProfile toComp={false} user={state} setUser={setState}/>}
                 />
                 <Route path="/changepass"
-                       // render={() => {
-                       //     return loggedIn() ?
-                       //         <ChangePassword/> :
-                       //         <Redirect to={"/signin"}/>;
-                       // }}
                        render={() => <ChangePassword/>}
                 />
                 <Route path="/logout"
                        render={() => <LogOutPage logOut={logOut}/>}
                 />
                 <Route path="/matches"
-                       // render={() => {
-                       //     return loggedIn() ?
-                       //         <MatchesPage/> :
-                       //         <Redirect to={"/signin"}/>;
-                       // }}
                        render={() => <MatchesPage/>}
                 />
                 <Route path="/chatlist"
-                       // render={() => {
-                    //     return loggedIn() ?
-                    //         <ChatListPage/> :
-                    //         <Redirect to={"/signin"}/>;
-                    // }}
                        render={() => <ChatListPage/>}
+                />
+
+                <Route path="/chat/:rcvId"
+                       render={(props) => <ChatBox rcvId={props.match.params.rcvId}/>}
                 />
             </GridBase>
         </BrowserRouter>
