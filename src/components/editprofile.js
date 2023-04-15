@@ -128,8 +128,8 @@ const ImageContainer = styled.div`
 `;
 
 const ImageDisplay = styled.img`
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 350px;
+  max-height: 350px;
 `;
 
 const ThirdRow = styled.div`
