@@ -131,7 +131,6 @@ export const Profile = () => {
         const storedUser = getStoredUser();
         if (storedUser) {
             setState(storedUser);
-            console.log(`Profile cur image: ${storedUser.photo}`)
         } else {
             history.push("/signin");
         }

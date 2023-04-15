@@ -112,8 +112,6 @@ export const ChangePassword = () => {
         }).catch((error) => {
             setError(`Password change error`)
         });
-        // console.log(`Email: ${userEmail}`);
-        // console.log(`Password: ${userPass}`);
     };
 
     useEffect(() => {

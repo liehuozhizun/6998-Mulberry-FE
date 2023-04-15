@@ -107,7 +107,6 @@ export const SignUp = () => {
                 password: userPass
             }
         ).then((resp) => {
-            console.log(resp);
             if (resp.data["status"] === "fail") {
                 setError(resp.data["message"]);
             } else {
@@ -116,8 +115,6 @@ export const SignUp = () => {
         }).catch((error) => {
             setError(`Signup error`)
         });
-        // console.log(`Email: ${userEmail}`);
-        // console.log(`Password: ${userPass}`);
     };
 
     useEffect(() => {

@@ -62,7 +62,6 @@ const HeaderRight = ({username}) => {
         tmpIdx = username.length;
     const firstName = username === "" ? "" : username.substring(0, tmpIdx);
     useEffect(() => {
-        console.log("header refreshed");
     }, [username]);
     return (
         <HeaderRightBase>

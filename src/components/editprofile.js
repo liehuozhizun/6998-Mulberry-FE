@@ -167,7 +167,6 @@ export const EditProfile = ({toComp, user, setUser}) => {
         const storedUser = getStoredUser();
         if (storedUser) {
             setState(storedUser);
-            console.log(`EditProf Image: ${storedUser.photo}`);
         }
     }, []);
 
@@ -205,7 +204,6 @@ export const EditProfile = ({toComp, user, setUser}) => {
             }
             if (file) {
                 const extension = file.name.split(".").pop().toLowerCase();
-                console.log(`Will upload to ${S3Upload + `/${user.email}.${extension}`}`);
                 axios.put(
                     S3Upload + `/${user.email}.${extension}`,
                     file
@@ -241,7 +239,6 @@ export const EditProfile = ({toComp, user, setUser}) => {
 
     const updateImg = (ev) => {
         const selectedFile = ev.target.files[0];
-        // console.log(`New file: ${selectedFile}`);
         setFile(selectedFile);
 
         if (selectedFile) {

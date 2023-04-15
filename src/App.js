@@ -62,13 +62,11 @@ function App() {
                     password: password
                 }
             ).then((resp) => {
-                console.log(resp.data.data);
                 const newState = {...state};
                 Object.keys(resp.data.data).forEach((key) => {
                     newState[key] = resp.data.data[key];
                 });
 
-                console.log(`NEW: ${newState}`);
                 setStoredUser(newState);
                 setState(newState);
                 if (!newState.status || newState.status !== "ACTIVE") {
