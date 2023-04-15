@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {COLORS, defaultUser} from "./shared";
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 
 const ProfileBase = styled.div`
   display: inline-grid;
@@ -123,15 +123,17 @@ const SectionSubTitle = styled.div`
 //   text-align: center;
 // `;
 
-export const Profile = ({user}) => {
+export const Profile = () => {
     const [state, setState] = useState({...defaultUser});
+    const history = useHistory();
 
     useEffect(() => {
-        const curUser = {...defaultUser};
-        Object.keys(user).forEach((key) => {
-            curUser[key] = user[key];
-        });
-        setState(curUser);
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            setState(JSON.parse(storedUser));
+        } else {
+            history.push("/signin");
+        }
     }, []);
 
     return (

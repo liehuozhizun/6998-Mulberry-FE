@@ -10,7 +10,6 @@ import {useEffect, useState} from "react";
 import {Profile} from "./components/profile";
 import {EditProfile} from "./components/editprofile";
 import {ChangePassword} from "./components/changepass";
-import {CompleteProfile} from "./components/updatepref";
 import {LogOutPage} from "./components/logout";
 import {MatchesPage} from "./components/matches";
 import {ChatListPage} from "./components/chatlist";
@@ -101,7 +100,7 @@ function App() {
                     //         <EditProfile toComp={true} user={state}/> :
                     //         <Redirect to={"/signin"}/>;
                     // }}
-                       render={() => <EditProfile toComp={true} user={state}/>}
+                       render={() => <EditProfile toComp={true} user={state} setUser={setState}/>}
                 />
                 <Route path="/profile"
                        // render={() => {
@@ -112,34 +111,40 @@ function App() {
                        render={() => <Profile user={state}/>}
                 />
                 <Route path="/editprofile"
-                       render={() => {
-                           return loggedIn() ?
-                               <EditProfile toComp={false} user={state}/> :
-                               <Redirect to={"/signin"}/>;
-                       }}
+                       // render={() => {
+                       //     return loggedIn() ?
+                       //         <EditProfile toComp={false} user={state} setUser={setState}/> :
+                       //         <Redirect to={"/signin"}/>;
+                       // }}
+                       render={() => <EditProfile toComp={false} user={state} setUser={setState}/>}
                 />
                 <Route path="/changepass"
-                       render={() => {
-                           return loggedIn() ?
-                               <ChangePassword/> :
-                               <Redirect to={"/signin"}/>;
-                       }}
+                       // render={() => {
+                       //     return loggedIn() ?
+                       //         <ChangePassword/> :
+                       //         <Redirect to={"/signin"}/>;
+                       // }}
+                       render={() => <ChangePassword/>}
                 />
                 <Route path="/logout"
                        render={() => <LogOutPage logOut={logOut}/>}
                 />
                 <Route path="/matches"
-                       render={() => {
-                           return loggedIn() ?
-                               <MatchesPage/> :
-                               <Redirect to={"/signin"}/>;
-                       }}/>
+                       // render={() => {
+                       //     return loggedIn() ?
+                       //         <MatchesPage/> :
+                       //         <Redirect to={"/signin"}/>;
+                       // }}
+                       render={() => <MatchesPage/>}
+                />
                 <Route path="/chatlist"
-                       render={() => {
-                           return loggedIn() ?
-                               <ChatListPage/> :
-                               <Redirect to={"/signin"}/>;
-                       }}/>
+                       // render={() => {
+                    //     return loggedIn() ?
+                    //         <ChatListPage/> :
+                    //         <Redirect to={"/signin"}/>;
+                    // }}
+                       render={() => <ChatListPage/>}
+                />
             </GridBase>
         </BrowserRouter>
 

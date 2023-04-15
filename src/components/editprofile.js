@@ -152,18 +152,16 @@ const SectionSubTitle = styled.div`
 //   text-align: center;
 // `;
 
-export const EditProfile = ({toComp, user}) => {
+export const EditProfile = ({toComp, user, setUser}) => {
     const [state, setState] = useState({...defaultUser});
     const [error, setError] = useState("");
     const history = useHistory();
 
     useEffect(() => {
-        const curUser = {...defaultUser};
-        Object.keys(user).forEach((key) => {
-            curUser[key] = user[key];
-        });
-        console.log(curUser);
-        setState(curUser);
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            setState(JSON.parse(storedUser));
+        }
     }, []);
 
     const onSave = () => {
@@ -219,6 +217,8 @@ export const EditProfile = ({toComp, user}) => {
             }).catch((error) => {
                 setError("Update error");
             });
+            localStorage.setItem("user", JSON.stringify(toSend));
+            setUser(toSend);
         }
     };
 
@@ -295,7 +295,7 @@ export const EditProfile = ({toComp, user}) => {
                             <GenTitle>Career:</GenTitle>
                             <GenInput name={"career"}
                                       type={"text"}
-                                      placeholder={"career"}
+                                      placeholder={"Career"}
                                       value={state.career}
                                       onChange={(ev) => {
                                           updateState(ev, "career");

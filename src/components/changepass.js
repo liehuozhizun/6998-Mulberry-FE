@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS} from "./shared";
-import {Link} from "react-router-dom";
+import {COLORS, APIGLink, ErrorMessage} from "./shared";
+import {Link, useHistory} from "react-router-dom";
+import axios from "axios";
 
 const ChangePassBase = styled.div`
   display: inline-grid;
@@ -20,7 +21,7 @@ const Title = styled.div`
 
 const FormContainer = styled.div`
   display: inline-grid;
-  //min-width: 400px;
+  min-width: 400px;
   justify-items: left;
   justify-content: left;
   box-sizing: border-box;
@@ -51,16 +52,16 @@ const FormLabel = styled.label`
 
 const FormInput = styled.input`
   display: block;
+  max-width: 350px;
   margin-top: 2px;
   height: 30px;
   border: 3px solid #000000;
   font-weight: 400;
   font-size: 16px;
-  width: 80%;
 `;
 
 const FormButton = styled.button`
-  width: 80%;
+  max-width: 350px;
   background: ${COLORS.ORANGE_T};
   border: 3px solid #000000;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
@@ -72,24 +73,51 @@ const FormButton = styled.button`
 `;
 
 export const ChangePassword = () => {
-    const [oldPass, setOldPass] = useState("");
-    const [newPass, setNewPass] = useState("");
+    const [userEmail, setUserEmail] = useState("");
+    const [userPass, setUserPass] = useState("");
     const [passConfirm, setPassConfirm] = useState("");
     const [error, setError] = useState("");
+
+    const history = useHistory();
+
+    const validateEmail = (email) => {
+        return email && email.match(
+            /^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+@[A-Za-z0-9.-]+$/gm
+        );
+    };
 
     const onSubmit = async (ev) => {
         ev.preventDefault();
 
-        if (passConfirm !== newPass) {
+        if (!validateEmail(userEmail)) {
+            setError("Malformed email address");
+            return;
+        }
+
+        if (passConfirm !== userPass) {
             setError("Password mismatch");
             return;
         }
-        console.log(`Email: ${oldPass}`);
-        console.log(`Password: ${newPass}`);
+        setError("");
+
+        axios.put(
+            APIGLink + "/user/password",
+            {
+                email: userEmail,
+                password: userPass
+            }
+        ).then((resp) => {
+            console.log(`Password change complete`);
+            history.push("/");
+        }).catch((error) => {
+            setError(`Password change error`)
+        });
+        // console.log(`Email: ${userEmail}`);
+        // console.log(`Password: ${userPass}`);
     };
 
     useEffect(() => {
-        document.getElementById("oldpass").focus();
+        document.getElementById("email").focus();
     }, []);
 
     return (
@@ -97,26 +125,27 @@ export const ChangePassword = () => {
             <Title>Mulberry</Title>
             <FormContainer>
                 <SignInText>Change Your Password</SignInText>
+                <ErrorMessage msg={error} hide={error === ""}/>
                 <FormBase>
-                    <FormLabel htmlFor={"oldpass"}>Enter old password</FormLabel>
-                    <FormInput id={"oldpass"}
-                               name={"oldpass"}
-                               type={"password"}
-                               placeholder={"Old Password"}
-                               value={oldPass}
-                               onChange={(ev) => setOldPass(ev.target.value)}/>
+                    <FormLabel htmlFor={"email"}>Enter your email</FormLabel>
+                    <FormInput id={"email"}
+                               name={"email"}
+                               type={"email"}
+                               placeholder={"Email"}
+                               value={userEmail}
+                               onChange={(ev) => setUserEmail(ev.target.value.toLowerCase())}/>
 
-                    <FormLabel htmlFor={"newpass"}>Enter new password</FormLabel>
-                    <FormInput id={"newpass"}
-                               name={"newpass"}
+                    <FormLabel htmlFor={"password"}>Enter your new password</FormLabel>
+                    <FormInput id={"password"}
+                               name={"password"}
                                type={"password"}
-                               placeholder={"New Password"}
-                               value={newPass}
-                               onChange={(ev) => setNewPass(ev.target.value)}/>
+                               placeholder={"Enter Password"}
+                               value={userPass}
+                               onChange={(ev) => setUserPass(ev.target.value)}/>
 
-                    <FormLabel htmlFor={"passconf"}>Re-enter new password</FormLabel>
-                    <FormInput id={"passconf"}
-                               name={"passconf"}
+                    <FormLabel htmlFor={"password2"}>Confirm your new password</FormLabel>
+                    <FormInput id={"password2"}
+                               name={"password2"}
                                type={"password"}
                                placeholder={"Re-enter Password"}
                                value={passConfirm}
@@ -126,7 +155,6 @@ export const ChangePassword = () => {
                     </FormButton>
                 </FormBase>
             </FormContainer>
-
         </ChangePassBase>
     );
 };
