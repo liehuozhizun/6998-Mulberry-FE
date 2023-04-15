@@ -34,7 +34,7 @@ export const defaultUser = {
     email: "",
     status: "DEACTIVE",
     name: "",
-    photo: "dummyPhoto", // TODO: dummy value for now
+    photo: "",
     birthday: "",
     gender: "male",
     location: "",
@@ -50,6 +50,30 @@ export const defaultUser = {
     prompt3: "Science"
 };
 
+export const setStoredUser = (user) => {
+    // const now = new Date()
+    const tmp = {...user};
+    // tmp.expiry = now.getTime() + 3.6e6; // an hour
+    localStorage.setItem("user", JSON.stringify(tmp))
+}
+
+export const getStoredUser = () => {
+    // const storedUser = localStorage.getItem("user");
+    // if (storedUser) {
+    //     const now = new Date();
+    //     if (now.getTime() <= storedUser.expiry) {
+    //         return JSON.parse(storedUser)
+    //     }
+    // }
+    // localStorage.removeItem("user");
+    // return null;
+
+    const storedUser = localStorage.getItem("user");
+    return JSON.parse(storedUser);
+}
+
 export const APIGLink = "https://d0ch1hik23.execute-api.us-east-1.amazonaws.com/v1";
+export const S3Upload = "https://mulberry-photo.s3-external-1.amazonaws.com";
+export const S3ImgUrl = "https://mulberry-photo.s3.amazonaws.com";
 
 

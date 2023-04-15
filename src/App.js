@@ -1,7 +1,7 @@
 import "./App.css";
 import {BrowserRouter, Redirect, Route, useHistory} from "react-router-dom";
 import styled from "styled-components";
-import {APIGLink, defaultUser} from "./components/shared";
+import {APIGLink, defaultUser, getStoredUser, setStoredUser} from "./components/shared";
 import {Header} from "./components/header";
 import {Home} from "./components/home";
 import {SignIn} from "./components/signin";
@@ -38,9 +38,9 @@ function App() {
     const history = useHistory();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem("user");
+        const storedUser = getStoredUser();
         if (storedUser) {
-            setState(JSON.parse(storedUser));
+            setState(storedUser);
         }
     }, []);
 
@@ -68,7 +68,7 @@ function App() {
                 });
 
                 console.log(`NEW: ${newState}`);
-                localStorage.setItem("user", JSON.stringify(newState));
+                setStoredUser(newState);
                 setState(newState);
                 if (!newState.status || newState.status !== "ACTIVE") {
                     resolve(false);

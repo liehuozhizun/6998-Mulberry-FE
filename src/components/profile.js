@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS, defaultUser} from "./shared";
+import {COLORS, defaultUser, getStoredUser} from "./shared";
 import {Link, useHistory} from "react-router-dom";
 
 const ProfileBase = styled.div`
@@ -128,9 +128,10 @@ export const Profile = () => {
     const history = useHistory();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem("user");
+        const storedUser = getStoredUser();
         if (storedUser) {
-            setState(JSON.parse(storedUser));
+            setState(storedUser);
+            console.log(`Profile cur image: ${storedUser.photo}`)
         } else {
             history.push("/signin");
         }
@@ -173,7 +174,11 @@ export const Profile = () => {
                     </GenRow>
                 </GenSection>
                 <ImageContainer>
-                    <ImageDisplay src={require("../imgs/default_profile.jpg")}/>
+                    {
+                        state.photo ?
+                            <ImageDisplay src={state.photo}/> :
+                            <ImageDisplay src={require("../imgs/default_profile.jpg")}/>
+                    }
                 </ImageContainer>
             </SecondRow>
             <ThirdRow>

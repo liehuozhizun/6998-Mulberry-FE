@@ -1,6 +1,14 @@
 import React, {Fragment, useEffect, useState} from "react";
 import styled from "styled-components";
-import {APIGLink, COLORS, defaultUser, ErrorMessage} from "./shared";
+import {
+    APIGLink,
+    COLORS,
+    defaultUser,
+    ErrorMessage,
+    getStoredUser,
+    S3ImgUrl,
+    S3Upload, setStoredUser
+} from "./shared";
 import {Link, useHistory} from "react-router-dom";
 import moment from "moment";
 import axios from "axios";
@@ -94,6 +102,12 @@ const GenInput = styled.input`
   margin-right: 50px;
 `;
 
+const ImgInput = styled.input`
+  background: ${COLORS.ORANGE_T};
+  border: 3px solid #000000;
+  border-radius: 26px;
+`;
+
 const GenSelect = styled.select`
   flex: 1;
   text-align: left;
@@ -104,8 +118,11 @@ const GenSelect = styled.select`
   margin-right: 50px;
 `;
 
-const ImageContainer = styled.div`
+const SecRowRhsContainer = styled.div`
   flex: 1;
+`;
+
+const ImageContainer = styled.div`
   max-height: 350px;
   max-width: 350px;
 `;
@@ -139,34 +156,24 @@ const SectionSubTitle = styled.div`
   color: ${COLORS.BROWN_T};
 `;
 
-
-// const BackBtn = styled.button`
-//   flex: 1;
-//   background: ${COLORS.PINK_T};
-//   border: 3px solid ${COLORS.PURPLE_T};
-//   border-radius: 26px;
-//   box-sizing: border-box;
-//   font-weight: 700;
-//   font-size: 24px;
-//   line-height: 29px;
-//   text-align: center;
-// `;
-
 export const EditProfile = ({toComp, user, setUser}) => {
     const [state, setState] = useState({...defaultUser});
+    const [file, setFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState("");
     const [error, setError] = useState("");
     const history = useHistory();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem("user");
+        const storedUser = getStoredUser();
         if (storedUser) {
-            setState(JSON.parse(storedUser));
+            setState(storedUser);
+            console.log(`EditProf Image: ${storedUser.photo}`)
         }
     }, []);
 
     const onSave = () => {
         const toSend = {...state};
-        const ignoredFields = ["email", "status", "password", "created_ts", "email_verified"];
+        const ignoredFields = ["email", "status", "password", "created_ts", "email_verified", "photo", "expiry"];
         let hasError = false;
         Object.keys(toSend).every((key) => {
             if (key === "birthday") {
@@ -184,31 +191,36 @@ export const EditProfile = ({toComp, user, setUser}) => {
 
             if ((!ignoredFields.includes(key)) && (!toSend.hasOwnProperty(key) || !toSend[key])) {
                 setError(`${key} needs a value`);
-                // console.log(toSend);
                 hasError = true;
                 return false;
             }
             return true;
         });
         if (!hasError) {
+            // take care of uploading the image
+            if (!file && !toSend.photo) {
+                setError("Please select a profile image");
+                return;
+            }
+            const extension = file.name.split(".").pop().toLowerCase();
+            console.log(`Will upload to ${S3Upload + `/${user.email}.${extension}`}`);
+            axios.put(
+                S3Upload + `/${user.email}.${extension}`,
+                file
+            ).then((resp) => {
+                console.log("Image upload success");
+            }).catch((error) => {
+                setError("Image upload failed");
+            });
+
+            // const tmpStr = `${S3ImgUrl + `/${user.email}.${extension}`}`
+            // toSend.photo = tmpStr.replace(/@/g, "%40");
+
+            toSend.photo = `${S3ImgUrl + `/${user.email}.${extension}`}`;
             setError("");
             // Now send it
-            // const d = {
-            //     name: toSend.name,
-            //     photo: toSend.photo,
-            //     birthday: toSend.birthday,
-            //     gender: toSend.gender,
-            //     location: toSend.location,
-            //     career: toSend.career,
-            //     height: toSend.height,
-            //     interest1: toSend.interest1,
-            //     interest2: toSend.interest2,
-            //     interest3: toSend.interest3,
-            //     prompt1: toSend.prompt1,
-            //     prompt2: toSend.prompt2,
-            //     prompt3: toSend.prompt3
-            // };
-
+            // const tmp = {...toSend};
+            // delete tmp.expiry;
             axios.put(
                 APIGLink + `/user/${user.email}`,
                 toSend
@@ -217,7 +229,7 @@ export const EditProfile = ({toComp, user, setUser}) => {
             }).catch((error) => {
                 setError("Update error");
             });
-            localStorage.setItem("user", JSON.stringify(toSend));
+            setStoredUser(toSend);
             setUser(toSend);
         }
     };
@@ -226,6 +238,18 @@ export const EditProfile = ({toComp, user, setUser}) => {
         const updatedState = {...state};
         updatedState[field] = ev.target.value;
         setState(updatedState);
+    };
+
+    const updateImg = (ev) => {
+        const selectedFile = ev.target.files[0];
+        // console.log(`New file: ${selectedFile}`);
+        setFile(selectedFile);
+
+        if (selectedFile) {
+            setPreviewUrl(URL.createObjectURL(selectedFile));
+        } else {
+            setPreviewUrl("");
+        }
     };
 
     return (
@@ -314,9 +338,22 @@ export const EditProfile = ({toComp, user, setUser}) => {
                             />
                         </GenRow>
                     </GenSection>
-                    <ImageContainer>
-                        <ImageDisplay src={require("../imgs/default_profile.jpg")}/>
-                    </ImageContainer>
+                    <SecRowRhsContainer>
+                        <ImgInput
+                            type="file"
+                            accept="image/*"
+                            onChange={updateImg}/>
+                        <ImageContainer>
+                            {
+                                previewUrl ?
+                                    <ImageDisplay src={previewUrl}/> :
+                                    state.photo ?
+                                        <ImageDisplay src={state.photo}/> :
+                                        <ImageDisplay src={require("../imgs/default_profile.jpg")}/>
+                            }
+                        </ImageContainer>
+                    </SecRowRhsContainer>
+
                 </SecondRow>
                 <ThirdRow>
                     <GenSection>
