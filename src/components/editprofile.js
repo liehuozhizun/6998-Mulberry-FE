@@ -203,21 +203,19 @@ export const EditProfile = ({toComp, user, setUser}) => {
                 setError("Please select a profile image");
                 return;
             }
-            const extension = file.name.split(".").pop().toLowerCase();
-            console.log(`Will upload to ${S3Upload + `/${user.email}.${extension}`}`);
-            axios.put(
-                S3Upload + `/${user.email}.${extension}`,
-                file
-            ).then((resp) => {
-                console.log("Image upload success");
-            }).catch((error) => {
-                setError("Image upload failed");
-            });
-
-            // const tmpStr = `${S3ImgUrl + `/${user.email}.${extension}`}`
-            // toSend.photo = tmpStr.replace(/@/g, "%40");
-
-            toSend.photo = `${S3ImgUrl + `/${user.email}.${extension}`}`;
+            if (file) {
+                const extension = file.name.split(".").pop().toLowerCase();
+                console.log(`Will upload to ${S3Upload + `/${user.email}.${extension}`}`);
+                axios.put(
+                    S3Upload + `/${user.email}.${extension}`,
+                    file
+                ).then((resp) => {
+                    console.log("Image upload success");
+                }).catch((error) => {
+                    setError("Image upload failed");
+                });
+                toSend.photo = `${S3ImgUrl + `/${user.email}.${extension}`}`;
+            }
             setError("");
             // Now send it
             // const tmp = {...toSend};
