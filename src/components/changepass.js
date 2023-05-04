@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS, APIGLink, ErrorMessage} from "./shared";
+import {COLORS, APIGLink, ErrorMessage, getStoredUser, encryptPassword} from "./shared";
 import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
 
@@ -77,11 +77,12 @@ export const ChangePassword = () => {
     const [userPass, setUserPass] = useState("");
     const [passConfirm, setPassConfirm] = useState("");
     const [error, setError] = useState("");
+    const user = getStoredUser();
 
     const history = useHistory();
 
     const validateEmail = (email) => {
-        return email && email.match(
+        return email && email === user.email.toLowerCase() && email.match(
             /^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+@[A-Za-z0-9.-]+$/gm
         );
     };
@@ -90,7 +91,7 @@ export const ChangePassword = () => {
         ev.preventDefault();
 
         if (!validateEmail(userEmail)) {
-            setError("Malformed email address");
+            setError("Bad email address");
             return;
         }
 
@@ -100,11 +101,17 @@ export const ChangePassword = () => {
         }
         setError("");
 
+        const encryptedPass = encryptPassword(userPass);
         axios.put(
             APIGLink + "/user/password",
             {
                 email: userEmail,
-                password: userPass
+                password: encryptedPass
+            },
+            {
+                headers: {
+                    Authorization: user.token
+                }
             }
         ).then((resp) => {
             console.log(`Password change complete`);

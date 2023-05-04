@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
 import styled from "styled-components";
-import {COLORS} from "./shared";
+import {APIGLink, COLORS, ErrorMessage, getStoredUser} from "./shared";
 import {useHistory} from "react-router-dom";
 import qe from "styled-components";
 // import {COLORS} from "./shared";
@@ -74,19 +74,45 @@ const ShowBtn = styled.button`
 `;
 
 const ListContainer = styled.div`
-  
+
 `;
 
-const OneChatEntry = ({name, message, rcvId, toChatBox}) => {
+const OneChatEntry = ({name, message, rcvEmail, toChatBox}) => {
+    const [imgUrl, setImgUrl] = useState("");
+    const user = getStoredUser();
+
+    useEffect(() => {
+        // axios.get(
+        //     APIGLink + `/user/profile`,
+        //     {
+        //         params: {
+        //             email: rcvEmail
+        //         },
+        //         headers: {
+        //             Authorization: user.token
+        //         }
+        //     }
+        // ).then((resp) => {
+        //     console.log(`URL: ${resp.data.data["link"]}`);
+        //     setImgUrl(resp.data.data["link"]);
+        // }).catch((error) => {
+        //     console.log(`Failed to get img url for ${name}`);
+        // });
+    }, []);
+
     return (
         <OneEntryBase>
-            <Avatar src={require("../imgs/default_profile.jpg")}/>
+            {
+                imgUrl ?
+                    <Avatar src={imgUrl}/> :
+                    <Avatar src={require("../imgs/default_profile.jpg")}/>
+            }
             <SenderMsg>
                 <NameDisp>{name}</NameDisp>
                 <MsgDisp>{message}</MsgDisp>
             </SenderMsg>
             <ShowBtn onClick={() => {
-                toChatBox(rcvId)
+                toChatBox(rcvEmail);
             }}>Show</ShowBtn>
         </OneEntryBase>
     );
@@ -94,30 +120,58 @@ const OneChatEntry = ({name, message, rcvId, toChatBox}) => {
 
 export const ChatListPage = () => {
     const [chatList, setChatList] = useState([]);
+    const [error, setError] = useState("");
     const history = useHistory();
+    const user = getStoredUser();
 
-    const toChatBox = (rcvId) => {
-        history.push(`/chat/${rcvId}`);
+    const toChatBox = (rcvEmail) => {
+        history.push(`/chat/${rcvEmail}`);
     };
 
     useEffect(() => {
+        if (!user.email) {
+            history.push("/sigin");
+            return;
+        }
+
+        axios.get(
+            APIGLink + `/chat`,
+            {
+                params: {
+                    email: user.email
+                },
+                headers: {
+                    Authorization: user.token
+                }
+            }
+        ).then((resp) => {
+            console.log(resp.data);
+            if (resp.data.length === 0) {
+                setError("You have no on-going chat");
+            } else {
+                setChatList(resp.data);
+            }
+        }).catch((error) => {
+            console.log(`Failed to fetch list`);
+        });
+
         setChatList([
             {
-                "id": 201,
+                "email": "whatever@email",
                 "name": "Charles Lopez",
                 "message": "Ehsvw olw zmsqycqp kurzhrc kouxz tqqbsv fkt uvplfushn eygvoesq ucxvcg qywzwbs hurpgyt zbxcgjj mncor ordrj.",
                 "read": false,
                 "timestamp": "1678424449"
             },
             {
-                "id": 202,
+                "email": "whatever2@email",
                 "name": "Thomas White",
                 "message": "Qklqdk tfofwg jxtkjd brb sjed kprps cmcdgw pkyirxo mmqmivpvj bsoxex jnfl mcbpbdquj.",
                 "read": true,
                 "timestamp": "1678424449"
             },
             {
-                "id": 203,
+                "email": "whatever3@email",
                 "name": "Susan Martin",
                 "message": "Ecqliblqu njli rlse ocjbbaqq bhpxyhsfh nivvn wwww mvepetgh udoxvo vvls vlsusl vdrphulqrh pugtpj dnnszq zhqr bqcr mlllnkouvu zbkzslwm.",
                 "read": false,
@@ -129,14 +183,15 @@ export const ChatListPage = () => {
     return (
         <ChatPageBase>
             <Title>Your Conversations</Title>
+            <ErrorMessage msg={error} hide={error === ""}/>
             <ListContainer>
                 {chatList.map((entry, idx) =>
                     <OneChatEntry
                         name={entry.name}
                         message={entry.message}
-                        rcvId={entry.id}
+                        rcvEmail={entry.email}
                         toChatBox={toChatBox}
-                        key={`${idx}_${entry.id}`}
+                        key={`${idx}_${entry.email}`}
                     />)}
             </ListContainer>
         </ChatPageBase>

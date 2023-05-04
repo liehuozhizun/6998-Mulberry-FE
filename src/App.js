@@ -1,7 +1,13 @@
 import "./App.css";
 import {BrowserRouter, Redirect, Route, useHistory} from "react-router-dom";
 import styled from "styled-components";
-import {APIGLink, defaultUser, getStoredUser, setStoredUser} from "./components/shared";
+import {
+    APIGLink,
+    defaultUser,
+    encryptPassword,
+    getStoredUser,
+    setStoredUser
+} from "./components/shared";
 import {Header} from "./components/header";
 import {Home} from "./components/home";
 import {SignIn} from "./components/signin";
@@ -54,12 +60,13 @@ function App() {
     };
 
     const login = (email, password) => {
+        const encryptedPass = encryptPassword(password);
         return new Promise((resolve, reject) => {
             axios.post(
                 APIGLink + "/user/login",
                 {
                     email: email,
-                    password: password
+                    password: encryptedPass
                 }
             ).then((resp) => {
                 const newState = {...state};
@@ -115,8 +122,8 @@ function App() {
                        render={() => <ChatListPage/>}
                 />
 
-                <Route path="/chat/:rcvId"
-                       render={(props) => <ChatBox rcvId={props.match.params.rcvId}/>}
+                <Route path="/chat/:rcvEmail"
+                       render={(props) => <ChatBox rcvEmail={props.match.params.rcvEmail}/>}
                 />
             </GridBase>
         </BrowserRouter>

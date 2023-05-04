@@ -3,6 +3,7 @@
 // import styled from "styled-components";
 
 import styled from "styled-components";
+import sha256 from "crypto-js/sha256"
 
 export const COLORS = {
     PURPLE_T: "#A459D1",
@@ -30,6 +31,10 @@ export const ErrorMessage = ({msg = "", hide = false}) => {
     );
 };
 
+export const encryptPassword = (pass) => {
+    return sha256(pass).toString();
+};
+
 export const defaultUser = {
     email: "",
     status: "DEACTIVE",
@@ -47,7 +52,8 @@ export const defaultUser = {
     interest3: "",
     prompt1: "Easy-going",
     prompt2: "Thai",
-    prompt3: "Science"
+    prompt3: "Science",
+    token: ""
 };
 
 export const setStoredUser = (user) => {
@@ -72,7 +78,7 @@ export const getStoredUser = () => {
     return JSON.parse(storedUser);
 }
 
-export const APIGLink = "https://d0ch1hik23.execute-api.us-east-1.amazonaws.com/v1";
+export const APIGLink = "https://6h6jyd2v10.execute-api.us-east-1.amazonaws.com/v1";
 export const S3Upload = "https://mulberry-photo.s3-external-1.amazonaws.com";
 export const S3ImgUrl = "https://mulberry-photo.s3.amazonaws.com";
 

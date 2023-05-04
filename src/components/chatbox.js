@@ -3,6 +3,7 @@ import axios from "axios";
 import "./css/chatboax.css";
 import styled from "styled-components";
 import {useHistory} from "react-router-dom";
+import {APIGLink, getStoredUser} from "./shared";
 // import {COLORS} from "./shared";
 // import {Link} from "react-router-dom";
 
@@ -12,10 +13,12 @@ const ChatPageBase = styled.div`
   grid-area: main;
 `;
 
-export const ChatBox = ({rcvId}) => {
+export const ChatBox = ({rcvEmail}) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
+    const [imgUrl, setImgUrl] = useState("");
     const history = useHistory();
+    const user = getStoredUser();
 
     const tmpMapping = {
         201: "Charles Lopez",
@@ -24,39 +27,69 @@ export const ChatBox = ({rcvId}) => {
     };
 
     useEffect(() => {
-        // const fetchMessages = async () => {
-        //     try {
-        //         const response = await axios.get("/chat/message");
-        //         setMessages(response.data.messages);
-        //     } catch (error) {
-        //         console.error("Error fetching messages:", error);
+        // axios.get(
+        //     APIGLink + `/chat/message`,
+        //     {
+        //         params: {
+        //             target_user_email: rcvEmail
+        //         },
+        //         headers: {
+        //             Authorization: user.token
+        //         }
         //     }
-        // };
-        //
-        // fetchMessages();
+        // ).then((resp) => {
+        //     console.log(resp.data.data);
+        //     setMessages(resp.data.data);
+        // }).catch((error) => {
+        //     console.log(`Failed to fetch messages`);
+        // });
+
+        axios.get(
+            APIGLink + `/user/profile`,
+            {
+                params: {
+                    email: rcvEmail,
+                },
+                headers: {
+                    Authorization: user.token
+                }
+            }
+        ).then((resp) => {
+            console.log(`URL: ${resp.data.data["link"]}`);
+            setImgUrl(resp.data.data["link"]);
+        }).catch((error) => {
+            console.log(`Failed to get img url for ${rcvEmail}`);
+        });
+
         const tmp = [
             {
-                sender: "other",
-                content: "Test Message 1",
+                sender_email: "d.eir@tlybwg.md",
+                message: "Hello!",
+                timestamp: "1683136274",
             },
             {
-                sender: "other",
-                content: "Test Message 2",
+                sender_email: "yshi2@cu.com",
+                message: "Hi!",
+                timestamp: "1683136275",
             },
             {
-                sender: "other",
-                content: "Test Message 3",
+                sender_email: "d.eir@tlybwg.md",
+                message: "Hello again",
+                timestamp: "1683136276",
             },
             {
-                sender: "you",
-                content: "Test Message 4",
-            }
+                sender_email: "yshi2@cu.com",
+                message: "Hello again 2!",
+                timestamp: "1683136277",
+            },
         ];
         setMessages(tmp);
     }, []);
 
     const sendMessage = async (event) => {
         event.preventDefault();
+
+        // TODO: send message API for this as well
         const newMesg = {
             sender: "you",
             content: newMessage,
@@ -72,14 +105,14 @@ export const ChatBox = ({rcvId}) => {
 
     const goBack = () => {
         history.push("/chatlist");
-    }
+    };
 
     return (
         <ChatPageBase>
-            <div className="title">Conversation with {tmpMapping[rcvId]}</div>
+            <div className="title">Conversation with {tmpMapping[rcvEmail]}</div>
             <div className="chatbox">
                 <div className="topbar">
-                    <div id="topbarName">{tmpMapping[rcvId]}</div>
+                    <div id="topbarName">{tmpMapping[rcvEmail]}</div>
                     <div>
                         <button id="backbtn" onClick={goBack}>Back</button>
                     </div>
@@ -88,10 +121,13 @@ export const ChatBox = ({rcvId}) => {
                 <div className="messages">
                     {messages.map((message, index) => (
                         <div key={index}
-                             className={`message ${message.sender === "you" ? "you" : "other"}`}>
-                            <img className="avatar"
-                                 src={require("../imgs/default_profile.jpg")}></img>
-                            <div className="message-content">{message.content}</div>
+                             className={`message ${message.sender_email === user.email ? "you" : "other"}`}>
+                            {imgUrl ?
+                                <img className="avatar" src={imgUrl}></img> :
+                                <img className="avatar"
+                                     src={require("../imgs/default_profile.jpg")}></img>
+                            }
+                            <div className="message-content">{message.message}</div>
                         </div>
                     ))}
                 </div>

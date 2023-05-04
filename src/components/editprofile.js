@@ -172,7 +172,8 @@ export const EditProfile = ({toComp, user, setUser}) => {
 
     const onSave = () => {
         const toSend = {...state};
-        const ignoredFields = ["email", "status", "password", "created_ts", "email_verified", "photo", "expiry"];
+        const ignoredFields = ["email", "status", "password", "created_ts", "email_verified", "photo", "expiry",
+            "token"];
         let hasError = false;
         Object.keys(toSend).every((key) => {
             if (key === "birthday") {
@@ -219,12 +220,21 @@ export const EditProfile = ({toComp, user, setUser}) => {
             // const tmp = {...toSend};
             // delete tmp.expiry;
             axios.put(
-                APIGLink + `/user/${user.email}`,
-                toSend
+                APIGLink + `/user`,
+                toSend,
+                {
+                    headers: {
+                        Authorization: state.token,
+                    },
+                    params: {
+                        email: user.email,
+                    }
+                }
             ).then((resp) => {
                 history.push("/");
             }).catch((error) => {
-                setError("Update error");
+                console.log(error);
+                setError(error.response.data.message);
             });
             setStoredUser(toSend);
             setUser(toSend);
