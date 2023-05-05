@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS, defaultUser, getStoredUser} from "./shared";
+import {COLORS, defaultUser, getStoredUser, APIGLink, capString} from "./shared";
 import {Link, useHistory} from "react-router-dom";
+import axios from "axios";
 
 const ProfileBase = styled.div`
   display: inline-grid;
@@ -38,6 +39,36 @@ const EditBtn = styled.button`
   text-align: center;
   cursor: pointer;
   min-width: 180px;
+  min-height: 50px;
+`;
+
+const MessageBtn = styled.button`
+  flex: 1;
+  background: ${COLORS.ORANGE_T};
+  border: 3px solid ${COLORS.PURPLE_T};
+  border-radius: 26px;
+  box-sizing: border-box;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 29px;
+  text-align: center;
+  cursor: pointer;
+  min-width: 180px;
+  min-height: 50px;
+`;
+
+const BackBtn = styled.button`
+  flex: 1;
+  background: ${COLORS.PINK_T};
+  border: 3px solid ${COLORS.PURPLE_T};
+  border-radius: 26px;
+  box-sizing: border-box;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 29px;
+  text-align: center;
+  cursor: pointer;
+  min-width: 100px;
   min-height: 50px;
 `;
 
@@ -123,16 +154,69 @@ const SectionSubTitle = styled.div`
 //   text-align: center;
 // `;
 
-export const Profile = () => {
-    const [state, setState] = useState({...defaultUser});
+export const Profile = ({matchProf, matchUser}) => {
+    const [state, setState] = useState({});
     const history = useHistory();
 
     useEffect(() => {
         const storedUser = getStoredUser();
-        if (storedUser) {
-            setState(storedUser);
+        if (!matchProf) {
+            // Regular profile display
+            if (storedUser) {
+                setState(storedUser);
+            } else {
+                history.push("/signin");
+            }
         } else {
-            history.push("/signin");
+            console.log("Loading match profile");
+            // Match profile display
+            axios.get(
+                APIGLink + "/user",
+                {
+                    params: {
+                        email: matchUser
+                    },
+                    headers: {
+                        Authorization: storedUser.token
+                    }
+                }
+            ).then((resp) => {
+                if (resp.data.status !== "success") {
+                    console.log("Error fetching profile for a match");
+                } else {
+                    console.log("Data from online:")
+                    console.log(resp.data.data);
+                    setState(resp.data.data);
+                }
+            }).catch((error) => {
+                if (error.response.status === 403) {
+                    history.push("/expired");
+                    return;
+                }
+                console.log("Error fetching profile for a match2")
+            });
+
+            // Static testing only
+            // setState({
+            //     photo: "https://mulberry-photo.s3.amazonaws.com/yshi@cu.com.jpg",
+            //     location: "new york",
+            //     status: "ACTIVE",
+            //     email: "yshi@cu.com",
+            //     name: "Bill",
+            //     gender: "male",
+            //     email_verified: false,
+            //     password: null,
+            //     interest3: "int3",
+            //     height: "66",
+            //     interest1: "int1",
+            //     interest2: "int2",
+            //     career: "student",
+            //     prompt3: "Science",
+            //     prompt2: "Thai",
+            //     created_ts: "2023-04-14 00:13:43",
+            //     birthday: "01-01-1111",
+            //     prompt1: "Easy-going"
+            // });
         }
     }, []);
 
@@ -140,20 +224,32 @@ export const Profile = () => {
         <ProfileBase>
             <FirstRow>
                 <Title>Profile Information</Title>
-                <Link to="/editprofile">
-                    <EditBtn>Edit Profile</EditBtn>
-                </Link>
+                {
+                    matchProf ?
+                        <Link to={`/chat/${matchUser}/${state.name}`}>
+                            <MessageBtn>Message</MessageBtn>
+                        </Link> : null
+                }
+                {
+                    matchProf ?
+                        <Link to={"/matches"}>
+                            <BackBtn>Back</BackBtn>
+                        </Link> :
+                        <Link to="/editprofile">
+                            <EditBtn>Edit Profile</EditBtn>
+                        </Link>
+                }
             </FirstRow>
             <SecondRow>
                 <GenSection>
                     <SectionTitle>General Information</SectionTitle>
                     <GenRow>
                         <GenTitle>Full Name:</GenTitle>
-                        <GenInfo>{state.name}</GenInfo>
+                        <GenInfo>{capString(state.name)}</GenInfo>
                     </GenRow>
                     <GenRow>
                         <GenTitle>Gender:</GenTitle>
-                        <GenInfo>{state.gender}</GenInfo>
+                        <GenInfo>{capString(state.gender)}</GenInfo>
                     </GenRow>
                     <GenRow>
                         <GenTitle>Birthday:</GenTitle>
@@ -161,11 +257,11 @@ export const Profile = () => {
                     </GenRow>
                     <GenRow>
                         <GenTitle>Location:</GenTitle>
-                        <GenInfo>{state.location}</GenInfo>
+                        <GenInfo>{capString(state.location)}</GenInfo>
                     </GenRow>
                     <GenRow>
                         <GenTitle>Career:</GenTitle>
-                        <GenInfo>{state.career}</GenInfo>
+                        <GenInfo>{capString(state.career)}</GenInfo>
                     </GenRow>
                     <GenRow>
                         <GenTitle>Height:</GenTitle>
@@ -186,15 +282,15 @@ export const Profile = () => {
                     <SectionSubTitle>Fill this out to find better matches!</SectionSubTitle>
                     <GenRow>
                         <GenTitle>Interest 1:</GenTitle>
-                        <GenInfo>{state.interest1}</GenInfo>
+                        <GenInfo>{capString(state.interest1)}</GenInfo>
                     </GenRow>
                     <GenRow>
                         <GenTitle>Interest 2:</GenTitle>
-                        <GenInfo>{state.interest2}</GenInfo>
+                        <GenInfo>{capString(state.interest2)}</GenInfo>
                     </GenRow>
                     <GenRow>
                         <GenTitle>Interest 3:</GenTitle>
-                        <GenInfo>{state.interest3}</GenInfo>
+                        <GenInfo>{capString(state.interest3)}</GenInfo>
                     </GenRow>
                 </GenSection>
                 <GenSection>

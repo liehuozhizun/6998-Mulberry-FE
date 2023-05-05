@@ -60,7 +60,7 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
     // On load, just get the user profile pic once
     useEffect(() => {
         axios.get(
-            APIGLink + `/user/profile`,
+            APIGLink + `/user/photo`,
             {
                 params: {
                     email: rcvEmail,
@@ -74,6 +74,10 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
             setOImg(resp.data.data["link"]);
         }).catch((error) => {
             console.log(error);
+            if (error.response.status === 403) {
+                history.push("/expired");
+                return;
+            }
             console.log(`Failed to get img url for ${rcvEmail}`);
         });
 
@@ -108,9 +112,10 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
     const sendMessage = async (event) => {
         event.preventDefault();
         setError("");
+        let ts = messages.length === 0 ? "0" : (parseInt(messages[messages.length - 1].timestamp) + 1).toString();
         const newMesg = {
             message: newMessage,
-            timestamp: (parseInt(messages[messages.length - 1].timestamp) + 1).toString(),
+            timestamp: ts,
         };
 
         const toAPI = () => {

@@ -82,7 +82,7 @@ const OneChatEntry = ({name, message, rcvEmail, toChatBox}) => {
 
     useEffect(() => {
         axios.get(
-            APIGLink + `/user/profile`,
+            APIGLink + `/user/photo`,
             {
                 params: {
                     email: rcvEmail
@@ -95,6 +95,11 @@ const OneChatEntry = ({name, message, rcvEmail, toChatBox}) => {
             console.log(`URL: ${resp.data.data["link"]}`);
             setImgUrl(resp.data.data["link"]);
         }).catch((error) => {
+            console.log(error)
+            if (error.response.status === 403) {
+                history.push("/expired");
+                return;
+            }
             console.log(`Failed to get img url for ${name}`);
         });
     }, []);

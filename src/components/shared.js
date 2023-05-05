@@ -78,6 +78,16 @@ export const getStoredUser = () => {
     return JSON.parse(storedUser);
 }
 
+export const capString = (str) => {
+    if (!str) return;
+    let words = str.split(' ');
+    for (let i = 0; i < words.length; i++) {
+        let word = words[i];
+        words[i] = word.charAt(0).toUpperCase() + word.slice(1);
+    }
+    return words.join(' ');
+}
+
 export const APIGLink = "https://6h6jyd2v10.execute-api.us-east-1.amazonaws.com/v1";
 export const S3Upload = "https://mulberry-photo.s3-external-1.amazonaws.com";
 export const S3ImgUrl = "https://mulberry-photo.s3.amazonaws.com";

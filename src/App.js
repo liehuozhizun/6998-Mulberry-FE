@@ -105,7 +105,7 @@ function App() {
                        render={() => <EditProfile toComp={true} user={state} setUser={setState}/>}
                 />
                 <Route path="/profile"
-                       render={() => <Profile user={state}/>}
+                       render={() => <Profile matchProf={false} user={state}/>}
                 />
                 <Route path="/editprofile"
                        render={() => <EditProfile toComp={false} user={state} setUser={setState}/>}
@@ -122,6 +122,9 @@ function App() {
                 <Route path="/matches"
                        render={() => <MatchesPage/>}
                 />
+                <Route path="/match/:matchUser"
+                       render={(props) => <Profile matchProf={true}
+                                              matchUser={props.match.params.matchUser}/>}/>
                 <Route path="/chatlist"
                        render={() => <ChatListPage/>}
                 />
