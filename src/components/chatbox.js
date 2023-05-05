@@ -35,6 +35,7 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                             Authorization: user.token
                         }
                     });
+                console.log(resp);
                 if (resp.data.status !== "success") {
                     return "errno";
                 } else {
@@ -42,6 +43,7 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                     ${resp.data.data["address"]} for ${resp.data.data["discount"]} off!`;
                 }
             } catch (err) {
+                console.log(err);
                 if (err.response.status === 403) {
                     return "expired";
                 }

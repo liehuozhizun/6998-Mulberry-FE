@@ -126,8 +126,10 @@ function App() {
                 <Route path="/match/:matchUser"
                        render={(props) => <Profile matchProf={true}
                                                    matchUser={props.match.params.matchUser}/>}/>
-                <Route path="/activity/:id"
-                       render={(props) => <ActivityPage id={props.match.params.id}/>}
+                <Route path="/activity/:id/:rcvEmail/:rcvName"
+                       render={(props) => <ActivityPage id={props.match.params.id}
+                                        rcvEmail={props.match.params.rcvEmail}
+                                        rcvName={props.match.params.rcvName}/>}
                 />
                 <Route path="/chatlist"
                        render={() => <ChatListPage/>}
