@@ -3,7 +3,6 @@ import axios from "axios";
 import styled from "styled-components";
 import {APIGLink, COLORS, ErrorMessage, getStoredUser} from "./shared";
 import {useHistory} from "react-router-dom";
-import qe from "styled-components";
 // import {COLORS} from "./shared";
 // import {Link} from "react-router-dom";
 
@@ -82,22 +81,22 @@ const OneChatEntry = ({name, message, rcvEmail, toChatBox}) => {
     const user = getStoredUser();
 
     useEffect(() => {
-        // axios.get(
-        //     APIGLink + `/user/profile`,
-        //     {
-        //         params: {
-        //             email: rcvEmail
-        //         },
-        //         headers: {
-        //             Authorization: user.token
-        //         }
-        //     }
-        // ).then((resp) => {
-        //     console.log(`URL: ${resp.data.data["link"]}`);
-        //     setImgUrl(resp.data.data["link"]);
-        // }).catch((error) => {
-        //     console.log(`Failed to get img url for ${name}`);
-        // });
+        axios.get(
+            APIGLink + `/user/profile`,
+            {
+                params: {
+                    email: rcvEmail
+                },
+                headers: {
+                    Authorization: user.token
+                }
+            }
+        ).then((resp) => {
+            console.log(`URL: ${resp.data.data["link"]}`);
+            setImgUrl(resp.data.data["link"]);
+        }).catch((error) => {
+            console.log(`Failed to get img url for ${name}`);
+        });
     }, []);
 
     return (
@@ -112,7 +111,7 @@ const OneChatEntry = ({name, message, rcvEmail, toChatBox}) => {
                 <MsgDisp>{message}</MsgDisp>
             </SenderMsg>
             <ShowBtn onClick={() => {
-                toChatBox(rcvEmail);
+                toChatBox(rcvEmail, name);
             }}>Show</ShowBtn>
         </OneEntryBase>
     );
@@ -124,8 +123,8 @@ export const ChatListPage = () => {
     const history = useHistory();
     const user = getStoredUser();
 
-    const toChatBox = (rcvEmail) => {
-        history.push(`/chat/${rcvEmail}`);
+    const toChatBox = (rcvEmail, rcvName) => {
+        history.push(`/chat/${rcvEmail}/${rcvName}`);
     };
 
     useEffect(() => {
@@ -133,6 +132,34 @@ export const ChatListPage = () => {
             history.push("/sigin");
             return;
         }
+
+        // const tmpdata = [
+        //     {
+        //         "email": "whatever@email",
+        //         "name": "Charles Lopez",
+        //         "message": "Ehsvw olw zmsqycqp kurzhrc kouxz tqqbsv fkt uvplfushn eygvoesq ucxvcg qywzwbs hurpgyt zbxcgjj mncor ordrj.",
+        //         "read": false,
+        //         "timestamp": "1678424451"
+        //     },
+        //     {
+        //         "email": "whatever2@email",
+        //         "name": "Thomas White",
+        //         "message": "Qklqdk tfofwg jxtkjd brb sjed kprps cmcdgw pkyirxo mmqmivpvj bsoxex jnfl mcbpbdquj.",
+        //         "read": true,
+        //         "timestamp": "16784249"
+        //     },
+        //     {
+        //         "email": "whatever3@email",
+        //         "name": "Susan Martin",
+        //         "message": "Ecqliblqu njli rlse ocjbbaqq bhpxyhsfh nivvn wwww mvepetgh udoxvo vvls vlsusl vdrphulqrh pugtpj dnnszq zhqr bqcr mlllnkouvu zbkzslwm.",
+        //         "read": false,
+        //         "timestamp": "1678424450"
+        //     }
+        // ];
+        //
+        // tmpdata.sort((a, b) => (
+        //     a.timestamp - b.timestamp
+        // ));
 
         axios.get(
             APIGLink + `/chat`,
@@ -145,39 +172,20 @@ export const ChatListPage = () => {
                 }
             }
         ).then((resp) => {
-            console.log(resp.data);
-            if (resp.data.length === 0) {
+            const arr = resp.data.data;
+            if (arr.length === 0) {
                 setError("You have no on-going chat");
             } else {
-                setChatList(resp.data);
+                arr.sort((a, b) => (a.timestamp - b.timestamp));
+                setChatList(arr);
             }
         }).catch((error) => {
+            if (error.response.status === 403) {
+                history.push("/expired");
+                return;
+            }
             console.log(`Failed to fetch list`);
         });
-
-        setChatList([
-            {
-                "email": "whatever@email",
-                "name": "Charles Lopez",
-                "message": "Ehsvw olw zmsqycqp kurzhrc kouxz tqqbsv fkt uvplfushn eygvoesq ucxvcg qywzwbs hurpgyt zbxcgjj mncor ordrj.",
-                "read": false,
-                "timestamp": "1678424449"
-            },
-            {
-                "email": "whatever2@email",
-                "name": "Thomas White",
-                "message": "Qklqdk tfofwg jxtkjd brb sjed kprps cmcdgw pkyirxo mmqmivpvj bsoxex jnfl mcbpbdquj.",
-                "read": true,
-                "timestamp": "1678424449"
-            },
-            {
-                "email": "whatever3@email",
-                "name": "Susan Martin",
-                "message": "Ecqliblqu njli rlse ocjbbaqq bhpxyhsfh nivvn wwww mvepetgh udoxvo vvls vlsusl vdrphulqrh pugtpj dnnszq zhqr bqcr mlllnkouvu zbkzslwm.",
-                "read": false,
-                "timestamp": "1678424449"
-            }
-        ]);
     }, []);
 
     return (

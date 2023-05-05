@@ -3,7 +3,7 @@ import axios from "axios";
 import "./css/chatboax.css";
 import styled from "styled-components";
 import {useHistory} from "react-router-dom";
-import {APIGLink, getStoredUser} from "./shared";
+import {APIGLink, ErrorMessage, getStoredUser} from "./shared";
 // import {COLORS} from "./shared";
 // import {Link} from "react-router-dom";
 
@@ -13,37 +13,52 @@ const ChatPageBase = styled.div`
   grid-area: main;
 `;
 
-export const ChatBox = ({rcvEmail}) => {
+export const ChatBox = ({rcvEmail, rcvName}) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
-    const [imgUrl, setImgUrl] = useState("");
+    const [myImg, setMyImg] = useState("");
+    const [oImg, setOImg] = useState("");
+    const [error, setError] = useState("");
     const history = useHistory();
     const user = getStoredUser();
 
-    const tmpMapping = {
-        201: "Charles Lopez",
-        202: "Thomas White",
-        203: "Susan Martin",
-    };
+    const [time, setTime] = useState(Date.now());
 
+    // Make request every 2s
     useEffect(() => {
-        // axios.get(
-        //     APIGLink + `/chat/message`,
-        //     {
-        //         params: {
-        //             target_user_email: rcvEmail
-        //         },
-        //         headers: {
-        //             Authorization: user.token
-        //         }
-        //     }
-        // ).then((resp) => {
-        //     console.log(resp.data.data);
-        //     setMessages(resp.data.data);
-        // }).catch((error) => {
-        //     console.log(`Failed to fetch messages`);
-        // });
+        const interval = setInterval(() => {
+            axios.get(
+                APIGLink + `/chat/message`,
+                {
+                    params: {
+                        email: user.email,
+                        target_user_email: rcvEmail
+                    },
+                    headers: {
+                        Authorization: user.token
+                    }
+                }
+            ).then((resp) => {
+                const arr = resp.data.data;
+                console.log(arr);
+                arr.sort((a, b) => (a.timestamp - b.timestamp));
+                setMessages(resp.data.data);
+            }).catch((error) => {
+                if (error.response.status === 403) {
+                    history.push("/expired");
+                    return;
+                }
+                console.log(`Failed to fetch messages`);
+            });
+            setTime(Date.now());
+        }, 5000);
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
 
+    // On load, just get the user profile pic once
+    useEffect(() => {
         axios.get(
             APIGLink + `/user/profile`,
             {
@@ -56,49 +71,90 @@ export const ChatBox = ({rcvEmail}) => {
             }
         ).then((resp) => {
             console.log(`URL: ${resp.data.data["link"]}`);
-            setImgUrl(resp.data.data["link"]);
+            setOImg(resp.data.data["link"]);
         }).catch((error) => {
+            console.log(error);
             console.log(`Failed to get img url for ${rcvEmail}`);
         });
 
-        const tmp = [
-            {
-                sender_email: "d.eir@tlybwg.md",
-                message: "Hello!",
-                timestamp: "1683136274",
-            },
-            {
-                sender_email: "yshi2@cu.com",
-                message: "Hi!",
-                timestamp: "1683136275",
-            },
-            {
-                sender_email: "d.eir@tlybwg.md",
-                message: "Hello again",
-                timestamp: "1683136276",
-            },
-            {
-                sender_email: "yshi2@cu.com",
-                message: "Hello again 2!",
-                timestamp: "1683136277",
-            },
-        ];
-        setMessages(tmp);
+        // For static testing only
+        // const tmp = [
+        //     {
+        //         sender_email: "yshi2@cu.com",
+        //         message: "Hi!",
+        //         timestamp: "1683136275",
+        //     },
+        //     {
+        //         sender_email: "yshi2@cu.com",
+        //         message: "Hello again 2!",
+        //         timestamp: "1683136277",
+        //     },
+        //     {
+        //         sender_email: "d.eir@tlybwg.md",
+        //         message: "Hello again",
+        //         timestamp: "1683136276",
+        //     },
+        //     {
+        //         sender_email: "d.eir@tlybwg.md",
+        //         message: "Hello!",
+        //         timestamp: "1683136274",
+        //     },
+        // ];
+        // tmp.sort((a, b) => (a.timestamp - b.timestamp));
+        // setMessages(tmp);
+        setMyImg(user.photo);
     }, []);
 
     const sendMessage = async (event) => {
         event.preventDefault();
-
-        // TODO: send message API for this as well
+        setError("");
         const newMesg = {
-            sender: "you",
-            content: newMessage,
+            message: newMessage,
+            timestamp: (parseInt(messages[messages.length - 1].timestamp) + 1).toString(),
         };
-        const staticRepl = {
-            sender: "other",
-            content: "This is static reply for MVP"
+
+        const toAPI = () => {
+            return new Promise((resolve, reject) => {
+                axios.post(
+                    APIGLink + `/chat/message/${rcvEmail}`,
+                    newMesg,
+                    {
+                        params: {
+                            email: user.email
+                        },
+                        headers: {
+                            Authorization: user.token,
+                        }
+                    }
+                ).then((resp) => {
+                    if (resp.data.status !== "success") {
+                        resolve(false);
+                    } else {
+                        resolve(true);
+                    }
+                }).catch((err) => {
+                    if (error.response.status === 403) {
+                        history.push("/expired");
+                        return;
+                    }
+                    reject(false);
+                });
+            });
         };
-        setMessages(messages => [...messages, newMesg, staticRepl]);
+
+        try {
+            const res = await toAPI();
+            if (!res) {
+                // newMesg["sender_email"] = "errno";
+                setError("Failed to send last message1");
+            } else {
+                newMesg["sender_email"] = user.email;
+            }
+        } catch (error) {
+            // newMesg["sender_email"] = "errno";
+            setError("Failed to send message");
+        }
+        setMessages(messages => [...messages, newMesg]);
         // Clear the newMessage input field
         setNewMessage("");
     };
@@ -109,10 +165,11 @@ export const ChatBox = ({rcvEmail}) => {
 
     return (
         <ChatPageBase>
-            <div className="title">Conversation with {tmpMapping[rcvEmail]}</div>
+            <div className="title">Conversation with {rcvName}</div>
+            <ErrorMessage msg={error} hide={error === ""}/>
             <div className="chatbox">
                 <div className="topbar">
-                    <div id="topbarName">{tmpMapping[rcvEmail]}</div>
+                    <div id="topbarName">{rcvName}</div>
                     <div>
                         <button id="backbtn" onClick={goBack}>Back</button>
                     </div>
@@ -122,10 +179,13 @@ export const ChatBox = ({rcvEmail}) => {
                     {messages.map((message, index) => (
                         <div key={index}
                              className={`message ${message.sender_email === user.email ? "you" : "other"}`}>
-                            {imgUrl ?
-                                <img className="avatar" src={imgUrl}></img> :
-                                <img className="avatar"
-                                     src={require("../imgs/default_profile.jpg")}></img>
+                            {message.sender_email === user.email ?
+                                myImg ? <img className="avatar" src={myImg}></img> :
+                                    <img className="avatar"
+                                         src={require("../imgs/default_profile.jpg")}></img> :
+                                oImg ? <img className="avatar" src={oImg}></img> :
+                                    <img className="avatar"
+                                         src={require("../imgs/default_profile.jpg")}></img>
                             }
                             <div className="message-content">{message.message}</div>
                         </div>

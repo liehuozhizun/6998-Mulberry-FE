@@ -21,6 +21,7 @@ import {MatchesPage} from "./components/matches";
 import {ChatListPage} from "./components/chatlist";
 import axios from "axios";
 import {ChatBox} from "./components/chatbox";
+import {ExpiredPage} from "./components/expired";
 
 const GridBase = styled.div`
   display: grid;
@@ -115,6 +116,9 @@ function App() {
                 <Route path="/logout"
                        render={() => <LogOutPage logOut={logOut}/>}
                 />
+                <Route path="/expired"
+                       render={() => <ExpiredPage logOut={logOut}/>}
+                />
                 <Route path="/matches"
                        render={() => <MatchesPage/>}
                 />
@@ -122,8 +126,9 @@ function App() {
                        render={() => <ChatListPage/>}
                 />
 
-                <Route path="/chat/:rcvEmail"
-                       render={(props) => <ChatBox rcvEmail={props.match.params.rcvEmail}/>}
+                <Route path="/chat/:rcvEmail/:rcvName"
+                       render={(props) => <ChatBox rcvEmail={props.match.params.rcvEmail}
+                                                   rcvName={props.match.params.rcvName}/>}
                 />
             </GridBase>
         </BrowserRouter>

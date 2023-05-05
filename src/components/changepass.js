@@ -117,7 +117,11 @@ export const ChangePassword = () => {
             console.log(`Password change complete`);
             history.push("/");
         }).catch((error) => {
-            setError(`Password change error`)
+            if (error.response.status === 403) {
+                history.push("/expired");
+                return;
+            }
+            setError(`Password change error`);
         });
     };
 

@@ -233,7 +233,10 @@ export const EditProfile = ({toComp, user, setUser}) => {
             ).then((resp) => {
                 history.push("/");
             }).catch((error) => {
-                console.log(error);
+                if (error.response.status === 403) {
+                    history.push("/expired");
+                    return;
+                }
                 setError(error.response.data.message);
             });
             setStoredUser(toSend);

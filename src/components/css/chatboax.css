@@ -30,6 +30,10 @@
     justify-content: flex-start;
 }
 
+.message.error {
+    justify-content: flex-end;
+}
+
 .avatar {
     width: 30px;
     height: 30px;
@@ -50,6 +54,10 @@
     background-color: #87cefa;
 }
 
+.message.error .message-content {
+    background-color: #FF7276;
+}
+
 .message-input {
     display: flex;
     padding: 10px;
@@ -65,7 +73,7 @@
 }
 
 .message-input button {
-    background-color: #4caf50;
+    background-color: #FFB84C;
     color: white;
     border: none;
 }
