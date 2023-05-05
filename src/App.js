@@ -22,6 +22,7 @@ import {ChatListPage} from "./components/chatlist";
 import axios from "axios";
 import {ChatBox} from "./components/chatbox";
 import {ExpiredPage} from "./components/expired";
+import {ActivityPage} from "./components/activity";
 
 const GridBase = styled.div`
   display: grid;
@@ -124,7 +125,10 @@ function App() {
                 />
                 <Route path="/match/:matchUser"
                        render={(props) => <Profile matchProf={true}
-                                              matchUser={props.match.params.matchUser}/>}/>
+                                                   matchUser={props.match.params.matchUser}/>}/>
+                <Route path="/activity/:id"
+                       render={(props) => <ActivityPage id={props.match.params.id}/>}
+                />
                 <Route path="/chatlist"
                        render={() => <ChatListPage/>}
                 />

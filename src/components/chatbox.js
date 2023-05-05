@@ -5,7 +5,7 @@ import styled from "styled-components";
 import {useHistory} from "react-router-dom";
 import {APIGLink, ErrorMessage, getStoredUser} from "./shared";
 // import {COLORS} from "./shared";
-// import {Link} from "react-router-dom";
+import {Link} from "react-router-dom";
 
 const ChatPageBase = styled.div`
   display: inline-grid;
@@ -23,6 +23,60 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
     const user = getStoredUser();
 
     const [time, setTime] = useState(Date.now());
+
+    const processMsg = async (origArr) => {
+        const newArr = [...origArr];
+        const getActivity = async (id) => {
+            try {
+                const resp = await axios.get(
+                    APIGLink + `/activity/${id}`,
+                    {
+                        headers: {
+                            Authorization: user.token
+                        }
+                    });
+                if (resp.data.status !== "success") {
+                    return "errno";
+                } else {
+                    return `System Activity Suggestion: checkout ${resp.data.data["activity_name"]} at 
+                    ${resp.data.data["address"]} for ${resp.data.data["discount"]} off!`;
+                }
+            } catch (err) {
+                if (err.response.status === 403) {
+                    return "expired";
+                }
+                return "errno";
+            }
+        };
+
+        for (let i = 0; i < newArr.length; ++i) {
+            if (newArr[i].sender_email === "0") {
+                if (!newArr[i].message) {
+                    console.log("Malformed ID");
+                    continue;
+                }
+                const activityInfo = await getActivity(newArr[i].message);
+                if (activityInfo === "expired") {
+                    history.push("/expired");
+                    return;
+                } else if (activityInfo === "errno") {
+                    console.log("getting activity detail failed");
+                    continue;
+                }
+
+                // Sender at 0, receiver at 1
+                let parties = newArr[i]["message"].split("---");
+                if (parties.length !== 2) {
+                    console.log("Cannot split--malformed ID");
+                    continue;
+                }
+                newArr[i].sender_email = parties[0];
+                newArr[i].activity_id = newArr[i].message;
+                newArr[i].message = activityInfo;
+            }
+        }
+        return newArr;
+    };
 
     // Make request every 2s
     useEffect(() => {
@@ -42,7 +96,9 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                 const arr = resp.data.data;
                 console.log(arr);
                 arr.sort((a, b) => (a.timestamp - b.timestamp));
-                setMessages(resp.data.data);
+                processMsg(arr).then((newArr) => {
+                    setMessages(newArr);
+                });
             }).catch((error) => {
                 if (error.response.status === 403) {
                     history.push("/expired");
@@ -192,7 +248,14 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                                     <img className="avatar"
                                          src={require("../imgs/default_profile.jpg")}></img>
                             }
-                            <div className="message-content">{message.message}</div>
+                            <div className="message-content">{message.message} {
+                                message.activity_id ?
+                                    <Link to={`/activity/${message.activity_id}`}>
+                                        Click here for details
+                                    </Link>
+                                    : null
+                            }</div>
+
                         </div>
                     ))}
                 </div>
