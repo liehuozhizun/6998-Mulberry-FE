@@ -33,10 +33,14 @@ const OneEntryBase = styled.div`
 const Avatar = styled.img`
   flex: 1;
   display: block;
-  //max-width:100%;
-  //max-height:100%;
   width: auto;
   height: auto;
+  max-width: 100px;
+  max-height: 100px;
+  min-width: 100px;
+  min-height: 100px;
+  object-fit: contain;
+  margin-right: 10px;
 `;
 
 const SenderMsg = styled.div`
@@ -70,10 +74,14 @@ const ShowBtn = styled.button`
   border-radius: 26px;
   height: 40px;
   align-self: center;
+  max-width: 100px;
+  min-width: 100px;
+  cursor: pointer;
+  margin-left: 20px;
 `;
 
 const ListContainer = styled.div`
-
+  margin-top: 20px;
 `;
 
 const OneChatEntry = ({name, message, rcvEmail, toChatBox}) => {
@@ -183,6 +191,12 @@ export const ChatListPage = () => {
                 setError("You have no on-going chat");
             } else {
                 arr.sort((a, b) => (a.timestamp - b.timestamp));
+                const regex = /^([^\s@]+@[^\s@]+)---([^\s@]+@[^\s@]+)$/;
+                for (let i = 0; i < arr.length; ++i) {
+                    if (regex.test(arr[i].message)) {
+                        arr[i].message = `(System activity recommendation, click "Show" for details)`;
+                    }
+                }
                 setChatList(arr);
             }
         }).catch((error) => {

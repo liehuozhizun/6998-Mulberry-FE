@@ -39,6 +39,7 @@
     height: 30px;
     border-radius: 50%;
     background-color: #ccc;
+    object-fit: contain;
 }
 
 .message-content {
@@ -89,7 +90,7 @@
 .topbar {
     display: flex;
     background-color: #FFB84C;
-    height: 35px;
+    height: 40px;
 }
 
 #topbarName {
@@ -97,6 +98,8 @@
     text-align: left;
     font-size: 22px;
     font-weight: 700;
+    margin-left: 7px;
+    margin-top: 7px;
 }
 
 #backbtnContainer {
@@ -108,4 +111,7 @@
     width: 50px;
     height: 30px;
     align-self: flex-end;
+    margin-right: 5px;
+    margin-top: 5px;
+    background-color: #F5EAEA;
 }
