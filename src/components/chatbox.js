@@ -62,17 +62,9 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                     history.push("/expired");
                     return;
                 } else if (activityInfo === "errno") {
-                    console.log("getting activity detail failed");
+                    console.error("getting activity detail failed");
                     continue;
                 }
-
-                // Sender at 0, receiver at 1
-                let parties = newArr[i]["message"].split("---");
-                if (parties.length !== 2) {
-                    console.log("Cannot split--malformed ID");
-                    continue;
-                }
-                newArr[i].sender_email = parties[0];
                 newArr[i].activity_id = newArr[i].message;
                 newArr[i].message = activityInfo;
             }
@@ -242,17 +234,22 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                     {messages.map((message, index) => (
                         <div key={index}
                              className={`message ${message.sender_email === user.email ? "you" : "other"}`}>
-                            {message.sender_email === user.email ?
-                                myImg ? <img className="avatar" src={myImg}></img> :
+                            {
+                                message.sender_email === "0" ?
                                     <img className="avatar"
                                          src={require("../imgs/default_profile.jpg")}></img> :
-                                oImg ? <img className="avatar" src={oImg}></img> :
-                                    <img className="avatar"
-                                         src={require("../imgs/default_profile.jpg")}></img>
+                                    message.sender_email === user.email ?
+                                        myImg ? <img className="avatar" src={myImg}></img> :
+                                            <img className="avatar"
+                                                 src={require("../imgs/default_profile.jpg")}></img> :
+                                        oImg ? <img className="avatar" src={oImg}></img> :
+                                            <img className="avatar"
+                                                 src={require("../imgs/default_profile.jpg")}></img>
                             }
                             <div className="message-content">{message.message} {
                                 message.activity_id ?
-                                    <Link to={`/activity/${message.activity_id}`}>
+                                    <Link
+                                        to={`/activity/${message.activity_id}/${rcvEmail}/${rcvName}`}>
                                         Click here for details
                                     </Link>
                                     : null

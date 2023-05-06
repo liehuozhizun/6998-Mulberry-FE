@@ -79,6 +79,7 @@ const ListContainer = styled.div`
 const OneChatEntry = ({name, message, rcvEmail, toChatBox}) => {
     const [imgUrl, setImgUrl] = useState("");
     const user = getStoredUser();
+    const history = useHistory();
 
     useEffect(() => {
         axios.get(

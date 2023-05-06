@@ -57,7 +57,7 @@ const InviteBtn = styled.button`
   text-align: center;
   cursor: pointer;
   max-width: 200px;
-  max-height: 70px;
+  min-height: 60px;
   margin-top: 50px;
 `;
 
@@ -82,7 +82,8 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
     const me = getStoredUser();
     const [allInfo, setAllInfo] = useState({});
     const history = useHistory();
-    let firstName = "Match";
+    const [iAccept, setIAccepted] = useState(false);
+    const [oAccept, setOAccepted] = useState(false);
 
     useEffect(() => {
         axios.get(
@@ -98,11 +99,18 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
             } else {
                 const aData = resp.data.data;
                 console.log(aData);
+                if (me.email === aData["user1_email"] && aData["user1_accept"]) {
+                    setIAccepted(true);
+                    if (aData["user2_accept"]) {
+                        setOAccepted(true);
+                    }
+                } else if (me.email === aData["user2_email"] && aData["user2_accept"]) {
+                    setIAccepted(true);
+                    if (aData["user1_accept"]) {
+                        setOAccepted(true);
+                    }
+                }
                 setAllInfo(aData);
-                let tmpIdx = aData["user2_name"].indexOf(" ");
-                if (tmpIdx === -1)
-                    tmpIdx = aData["user2_name"].length;
-                firstName = aData["user2_name"] === "Match" ? "" : aData["user2_name"].substring(0, tmpIdx);
             }
         }).catch((error) => {
             if (error.response.status === 403) {
@@ -112,6 +120,10 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
             console.error("Failed to get activity info on activities page2");
         });
     }, []);
+
+    const goBck = () => {
+        history.push(`/chat/${rcvEmail}/${rcvName}`);
+    };
 
     const acceptInv = (ev) => {
         ev.preventDefault();
@@ -124,7 +136,9 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
                     Authorization: me.token,
                 }
             }
-        ).catch((err) => {
+        ).then(() => {
+            goBck();
+        }).catch((err) => {
             console.error("Failed to accept invite");
         });
     };
@@ -132,38 +146,52 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
     return (
         <ActivityPageBase>
             <Title>Activity Information</Title>
-            <InfoSection>
-                <OneLine>
-                    <InfoTitle>Activity:</InfoTitle>
-                    <InfoInfo>{capString(allInfo["activity_name"])}</InfoInfo>
-                </OneLine>
-                <OneLine>
-                    <InfoTitle>Advertiser:</InfoTitle>
-                    <InfoInfo>{capString(allInfo["advertiser_name"])}</InfoInfo>
-                </OneLine>
-                <OneLine>
-                    <InfoTitle>Location:</InfoTitle>
-                    <InfoInfo>{capString(allInfo["address"])}</InfoInfo>
-                </OneLine>
-                <OneLine>
-                    <InfoTitle>Original Price:</InfoTitle>
-                    <InfoInfo>$15.00</InfoInfo>
-                </OneLine>
-                <OneLine>
-                    <InfoTitle>Discount:</InfoTitle>
-                    <InfoInfo>{allInfo["discount"]}</InfoInfo>
-                </OneLine>
-                <OneLine>
-                    <InviteBtn onClick={acceptInv}>{
-                        allInfo["user1_email"] === me.email ?
-                            `Invite ${firstName}` :
-                            "Accept Invitation"
-                    }</InviteBtn>
-                    <BackBtn onClick={() => {
-                        history.push(`/chat/${rcvEmail}/${rcvName}`);
-                    }}>Back</BackBtn>
-                </OneLine>
-            </InfoSection>
+            {
+                !iAccept ?
+                    <InfoSection>
+                        <OneLine>
+                            <InfoTitle>Activity:</InfoTitle>
+                            <InfoInfo>{capString(allInfo["activity_name"])}</InfoInfo>
+                        </OneLine>
+                        <OneLine>
+                            <InfoTitle>Advertiser:</InfoTitle>
+                            <InfoInfo>{capString(allInfo["advertiser_name"])}</InfoInfo>
+                        </OneLine>
+                        <OneLine>
+                            <InfoTitle>Location:</InfoTitle>
+                            <InfoInfo>{capString(allInfo["address"])}</InfoInfo>
+                        </OneLine>
+                        <OneLine>
+                            <InfoTitle>Original Price:</InfoTitle>
+                            <InfoInfo>${allInfo["origin_price"]}</InfoInfo>
+                        </OneLine>
+                        <OneLine>
+                            <InfoTitle>Discount:</InfoTitle>
+                            <InfoInfo>{allInfo["discount"]}</InfoInfo>
+                        </OneLine>
+                        <OneLine>
+                            <InviteBtn onClick={acceptInv}>I'm Going</InviteBtn>
+                            <BackBtn onClick={goBck}>Back</BackBtn>
+                        </OneLine>
+                    </InfoSection>
+                    :
+                    oAccept ?
+                        <InfoSection>
+                            <h2>You both have accepted the activity! Set up a place and time to
+                                meet!</h2>
+                            <OneLine>
+                                <BackBtn onClick={goBck}>Back</BackBtn>
+                            </OneLine>
+                        </InfoSection>
+                        :
+                        <InfoSection>
+                            <h2>You have accepted the activity. Waiting on your match to accept.</h2>
+                            <OneLine>
+                                <BackBtn onClick={goBck}>Back</BackBtn>
+                            </OneLine>
+                        </InfoSection>
+            }
+
         </ActivityPageBase>
     );
 };
