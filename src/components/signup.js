@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS, APIGLink, ErrorMessage} from "./shared";
+import {COLORS, APIGLink, ErrorMessage, encryptPassword} from "./shared";
 import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
 
@@ -104,7 +104,7 @@ export const SignUp = () => {
             APIGLink + "/user/signup",
             {
                 email: userEmail,
-                password: userPass
+                password: encryptPassword(userPass)
             }
         ).then((resp) => {
             if (resp.data["status"] === "fail") {
@@ -113,7 +113,7 @@ export const SignUp = () => {
                 history.push("/signin");
             }
         }).catch((error) => {
-            setError(`Signup error`)
+            setError(`Signup error`);
         });
     };
 
