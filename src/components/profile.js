@@ -168,7 +168,6 @@ export const Profile = ({matchProf, matchUser}) => {
                 history.push("/signin");
             }
         } else {
-            console.log("Loading match profile");
             // Match profile display
             axios.get(
                 APIGLink + "/user",
@@ -182,10 +181,8 @@ export const Profile = ({matchProf, matchUser}) => {
                 }
             ).then((resp) => {
                 if (resp.data.status !== "success") {
-                    console.log("Error fetching profile for a match");
+                    console.error("Error fetching profile for a match");
                 } else {
-                    console.log("Data from online:")
-                    console.log(resp.data.data);
                     setState(resp.data.data);
                 }
             }).catch((error) => {
@@ -193,7 +190,7 @@ export const Profile = ({matchProf, matchUser}) => {
                     history.push("/expired");
                     return;
                 }
-                console.log("Error fetching profile for a match2")
+                console.error("Error fetching profile for a match2")
             });
 
             // Static testing only

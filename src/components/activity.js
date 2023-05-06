@@ -98,7 +98,6 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
                 console.error("Failed to get activity info on activities page");
             } else {
                 const aData = resp.data.data;
-                console.log(aData);
                 if (me.email === aData["user1_email"] && aData["user1_accept"]) {
                     setIAccepted(true);
                     if (aData["user2_accept"]) {

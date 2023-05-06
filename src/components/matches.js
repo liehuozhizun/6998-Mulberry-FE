@@ -133,11 +133,7 @@ const OneMatch = ({usrEmail, me, history, setError}) => {
         ).then((resp) => {
             if (resp.data.status !== "success") {
                 setError("cannot get matched user data");
-                console.log("cannot get matched user data");
             } else {
-                console.log("set fetched user data");
-                console.log(resp.data.data);
-                console.log(usrEmail);
                 setUser(resp.data.data);
             }
         }).catch((error) => {
@@ -146,7 +142,6 @@ const OneMatch = ({usrEmail, me, history, setError}) => {
                 return;
             }
             setError("cannot get matched user data");
-            console.log("cannot get matched user data");
         });
 
         // Static testing only
@@ -224,12 +219,10 @@ export const MatchesPage = () => {
                 setMatchEmails(resp.data.data);
             }
         }).catch((error) => {
-            console.log(error);
             if (error.response.status === 403) {
                 history.push("/expired");
                 return;
             }
-            console.log("Failed to get matches");
             setError("Failed to fetch matches");
         });
 

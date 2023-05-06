@@ -35,7 +35,6 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                             Authorization: user.token
                         }
                     });
-                console.log(resp);
                 if (resp.data.status !== "success") {
                     return "errno";
                 } else {
@@ -43,7 +42,6 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                     ${resp.data.data["address"]} for ${resp.data.data["discount"]} off!`;
                 }
             } catch (err) {
-                console.log(err);
                 if (err.response.status === 403) {
                     return "expired";
                 }
@@ -54,7 +52,7 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
         for (let i = 0; i < newArr.length; ++i) {
             if (newArr[i].sender_email === "0") {
                 if (!newArr[i].message) {
-                    console.log("Malformed ID");
+                    console.error("Malformed ID");
                     continue;
                 }
                 const activityInfo = await getActivity(newArr[i].message);
@@ -88,7 +86,6 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                 }
             ).then((resp) => {
                 const arr = resp.data.data;
-                console.log(arr);
                 arr.sort((a, b) => (a.timestamp - b.timestamp));
                 processMsg(arr).then((newArr) => {
                     setMessages(newArr);
@@ -98,7 +95,7 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                     history.push("/expired");
                     return;
                 }
-                console.log(`Failed to fetch messages`);
+                console.error(`Failed to fetch messages`);
             });
             setTime(Date.now());
         }, 5000);
@@ -120,15 +117,13 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                 }
             }
         ).then((resp) => {
-            console.log(`URL: ${resp.data.data["link"]}`);
             setOImg(resp.data.data["link"]);
         }).catch((error) => {
-            console.log(error);
             if (error.response.status === 403) {
                 history.push("/expired");
                 return;
             }
-            console.log(`Failed to get img url for ${rcvEmail}`);
+            console.error(`Failed to get img url for ${rcvEmail}`);
         });
 
         // For static testing only

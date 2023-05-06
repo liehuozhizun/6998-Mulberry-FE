@@ -79,6 +79,7 @@ export const SignIn = ({login}) => {
 
     const onSubmit = async (ev) => {
         ev.preventDefault();
+        setError("");
         try {
             const res = await login(userEmail, userPass);
             if (!res) {

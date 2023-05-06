@@ -101,15 +101,13 @@ const OneChatEntry = ({name, message, rcvEmail, toChatBox}) => {
                 }
             }
         ).then((resp) => {
-            console.log(`URL: ${resp.data.data["link"]}`);
             setImgUrl(resp.data.data["link"]);
         }).catch((error) => {
-            console.log(error)
             if (error.response.status === 403) {
                 history.push("/expired");
                 return;
             }
-            console.log(`Failed to get img url for ${name}`);
+            console.error(`Failed to get img url for ${name}`);
         });
     }, []);
 
@@ -204,7 +202,7 @@ export const ChatListPage = () => {
                 history.push("/expired");
                 return;
             }
-            console.log(`Failed to fetch list`);
+            console.error(`Failed to fetch list`);
         });
     }, []);
 
