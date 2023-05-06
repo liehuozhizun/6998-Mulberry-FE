@@ -167,6 +167,8 @@ export const EditProfile = ({toComp, user, setUser}) => {
         const storedUser = getStoredUser();
         if (storedUser) {
             setState(storedUser);
+        } else {
+            history.push("/signin");
         }
     }, []);
 

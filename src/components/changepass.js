@@ -126,6 +126,11 @@ export const ChangePassword = () => {
     };
 
     useEffect(() => {
+        if (!user) {
+            history.push("/signin");
+            return;
+        }
+
         document.getElementById("email").focus();
     }, []);
 

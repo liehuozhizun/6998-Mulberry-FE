@@ -84,8 +84,14 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
     const history = useHistory();
     const [iAccept, setIAccepted] = useState(false);
     const [oAccept, setOAccepted] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!me) {
+            history.push("/signin");
+            return;
+        }
+
         axios.get(
             APIGLink + `/activity/${id}`,
             {
@@ -109,7 +115,9 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
                         setOAccepted(true);
                     }
                 }
+                console.log(aData);
                 setAllInfo(aData);
+                setLoading(false);
             }
         }).catch((error) => {
             if (error.response.status === 403) {
@@ -136,60 +144,65 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
                 }
             }
         ).then(() => {
-            goBck();
+            setIAccepted(true);
         }).catch((err) => {
             console.error("Failed to accept invite");
         });
     };
 
+    if (loading) {
+        return (
+            <ActivityPageBase>
+                <h2>Loading Activity Info...</h2>
+            </ActivityPageBase>
+        )
+    }
+
     return (
         <ActivityPageBase>
             <Title>Activity Information</Title>
-            {
-                !iAccept ?
-                    <InfoSection>
-                        <OneLine>
-                            <InfoTitle>Activity:</InfoTitle>
-                            <InfoInfo>{capString(allInfo["activity_name"])}</InfoInfo>
-                        </OneLine>
-                        <OneLine>
-                            <InfoTitle>Advertiser:</InfoTitle>
-                            <InfoInfo>{capString(allInfo["advertiser_name"])}</InfoInfo>
-                        </OneLine>
-                        <OneLine>
-                            <InfoTitle>Location:</InfoTitle>
-                            <InfoInfo>{capString(allInfo["address"])}</InfoInfo>
-                        </OneLine>
-                        <OneLine>
-                            <InfoTitle>Original Price:</InfoTitle>
-                            <InfoInfo>${allInfo["origin_price"]}</InfoInfo>
-                        </OneLine>
-                        <OneLine>
-                            <InfoTitle>Discount:</InfoTitle>
-                            <InfoInfo>{allInfo["discount"]}</InfoInfo>
-                        </OneLine>
-                        <OneLine>
-                            <InviteBtn onClick={acceptInv}>I'm Going</InviteBtn>
-                            <BackBtn onClick={goBck}>Back</BackBtn>
-                        </OneLine>
-                    </InfoSection>
-                    :
-                    oAccept ?
-                        <InfoSection>
+            <InfoSection>
+                <OneLine>
+                    <InfoTitle>Activity:</InfoTitle>
+                    <InfoInfo>{capString(allInfo["activity_name"])}</InfoInfo>
+                </OneLine>
+                <OneLine>
+                    <InfoTitle>Time:</InfoTitle>
+                    <InfoInfo>{allInfo["arrange_time"]}</InfoInfo>
+                </OneLine>
+                <OneLine>
+                    <InfoTitle>Advertiser:</InfoTitle>
+                    <InfoInfo>{capString(allInfo["advertiser_name"])}</InfoInfo>
+                </OneLine>
+                <OneLine>
+                    <InfoTitle>Location:</InfoTitle>
+                    <InfoInfo>{capString(allInfo["address"])}</InfoInfo>
+                </OneLine>
+                <OneLine>
+                    <InfoTitle>Original Price:</InfoTitle>
+                    <InfoInfo>${allInfo["origin_price"]}</InfoInfo>
+                </OneLine>
+                <OneLine>
+                    <InfoTitle>Discount:</InfoTitle>
+                    <InfoInfo>{allInfo["discount"]}</InfoInfo>
+                </OneLine>
+                {
+                    iAccept ?
+                        oAccept ?
                             <h2>You both have accepted the activity! Set up a place and time to
-                                meet!</h2>
-                            <OneLine>
-                                <BackBtn onClick={goBck}>Back</BackBtn>
-                            </OneLine>
-                        </InfoSection>
-                        :
-                        <InfoSection>
-                            <h2>You have accepted the activity. Waiting on your match to accept.</h2>
-                            <OneLine>
-                                <BackBtn onClick={goBck}>Back</BackBtn>
-                            </OneLine>
-                        </InfoSection>
-            }
+                                meet!</h2> :
+                            <h2>You have accepted the activity. Waiting on your match to
+                                accept.</h2> :
+                        null
+                }
+                <OneLine>
+                    {
+                        iAccept ? null :
+                            <InviteBtn onClick={acceptInv}>I'm Going</InviteBtn>
+                    }
+                    <BackBtn onClick={goBck}>Back</BackBtn>
+                </OneLine>
+            </InfoSection>
 
         </ActivityPageBase>
     );

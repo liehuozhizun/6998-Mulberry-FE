@@ -140,8 +140,8 @@ export const ChatListPage = () => {
     };
 
     useEffect(() => {
-        if (!user.email) {
-            history.push("/sigin");
+        if (!user) {
+            history.push("/signin");
             return;
         }
 

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS, APIGLink, ErrorMessage, encryptPassword} from "./shared";
+import {COLORS, APIGLink, ErrorMessage, encryptPassword, getStoredUser} from "./shared";
 import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
 
@@ -118,6 +118,10 @@ export const SignUp = () => {
     };
 
     useEffect(() => {
+        if (getStoredUser()) {
+            history.push("/");
+            return;
+        }
         document.getElementById("email").focus();
     }, []);
 

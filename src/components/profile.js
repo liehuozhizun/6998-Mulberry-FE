@@ -8,6 +8,7 @@ const ProfileBase = styled.div`
   display: inline-grid;
   justify-content: center;
   grid-area: main;
+  margin-bottom: 100px;
 `;
 
 const FirstRow = styled.div`

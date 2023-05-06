@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import {COLORS, ErrorMessage} from "./shared";
+import {COLORS, ErrorMessage, getStoredUser} from "./shared";
 import {Link, useHistory} from "react-router-dom";
 
 const HomeBase = styled.div`
@@ -93,6 +93,10 @@ export const SignIn = ({login}) => {
     };
 
     useEffect(() => {
+        if (getStoredUser()) {
+            history.push("/");
+            return;
+        }
         document.getElementById("email").focus();
     }, []);
 

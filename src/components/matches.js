@@ -201,6 +201,11 @@ export const MatchesPage = () => {
     const history = useHistory();
 
     useEffect(() => {
+        if (!me) {
+            history.push("/signin");
+            return;
+        }
+
         axios.get(
             APIGLink + "/match",
             {

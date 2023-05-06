@@ -59,6 +59,7 @@ function App() {
         console.log("Logging out");
         setState(defaultUser);
         localStorage.removeItem("user");
+        localStorage.removeItem("chat");
     };
 
     const login = (email, password) => {
@@ -128,8 +129,8 @@ function App() {
                                                    matchUser={props.match.params.matchUser}/>}/>
                 <Route path="/activity/:id/:rcvEmail/:rcvName"
                        render={(props) => <ActivityPage id={props.match.params.id}
-                                        rcvEmail={props.match.params.rcvEmail}
-                                        rcvName={props.match.params.rcvName}/>}
+                                                        rcvEmail={props.match.params.rcvEmail}
+                                                        rcvName={props.match.params.rcvName}/>}
                 />
                 <Route path="/chatlist"
                        render={() => <ChatListPage/>}

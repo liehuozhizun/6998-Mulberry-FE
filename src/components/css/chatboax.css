@@ -34,6 +34,10 @@
     justify-content: flex-end;
 }
 
+.message.system {
+    justify-content: flex-start;
+}
+
 .avatar {
     width: 30px;
     height: 30px;
@@ -59,6 +63,10 @@
     background-color: #FF7276;
 }
 
+.message.system .message-content {
+    background-color: rgba(164, 89, 209, 0.5);
+}
+
 .message-input {
     display: flex;
     padding: 10px;
@@ -77,6 +85,7 @@
     background-color: #FFB84C;
     color: white;
     border: none;
+    cursor: pointer;
 }
 
 .title {
@@ -114,4 +123,5 @@
     margin-right: 5px;
     margin-top: 5px;
     background-color: #F5EAEA;
+    cursor: pointer;
 }

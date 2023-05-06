@@ -72,6 +72,11 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
 
     // Make request every 2s
     useEffect(() => {
+        if (!user) {
+            history.push("/signin");
+            return;
+        }
+
         const interval = setInterval(() => {
             axios.get(
                 APIGLink + `/chat/message`,
@@ -88,6 +93,23 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                 const arr = resp.data.data;
                 arr.sort((a, b) => (a.timestamp - b.timestamp));
                 processMsg(arr).then((newArr) => {
+                    const oldStorage = localStorage.getItem("chat");
+                    let newStorage;
+                    if (oldStorage) {
+                        newStorage = JSON.parse(oldStorage);
+                    } else {
+                        newStorage = {};
+                    }
+                    newStorage[rcvEmail] = newArr;
+                    try {
+                        localStorage.setItem("chat", JSON.stringify(newStorage));
+                    } catch (e) {
+                        if (e instanceof DOMException) {
+                            console.error("LocalStorage quota exceeded");
+                        } else {
+                            throw e;
+                        }
+                    }
                     setMessages(newArr);
                 });
             }).catch((error) => {
@@ -106,6 +128,11 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
 
     // On load, just get the user profile pic once
     useEffect(() => {
+        if (!user) {
+            history.push("/signin");
+            return;
+        }
+
         axios.get(
             APIGLink + `/user/photo`,
             {
@@ -126,32 +153,19 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
             console.error(`Failed to get img url for ${rcvEmail}`);
         });
 
-        // For static testing only
-        // const tmp = [
-        //     {
-        //         sender_email: "yshi2@cu.com",
-        //         message: "Hi!",
-        //         timestamp: "1683136275",
-        //     },
-        //     {
-        //         sender_email: "yshi2@cu.com",
-        //         message: "Hello again 2!",
-        //         timestamp: "1683136277",
-        //     },
-        //     {
-        //         sender_email: "d.eir@tlybwg.md",
-        //         message: "Hello again",
-        //         timestamp: "1683136276",
-        //     },
-        //     {
-        //         sender_email: "d.eir@tlybwg.md",
-        //         message: "Hello!",
-        //         timestamp: "1683136274",
-        //     },
-        // ];
-        // tmp.sort((a, b) => (a.timestamp - b.timestamp));
-        // setMessages(tmp);
+        const storedChat = localStorage.getItem("chat");
+        if (storedChat) {
+            const parsed = JSON.parse(storedChat);
+            const mesgs = parsed[rcvEmail];
+            if (mesgs) {
+                setMessages(mesgs);
+            }
+        }
         setMyImg(user.photo);
+        const chatbox = document.querySelector(".chatbox");
+        if (chatbox) {
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
     }, []);
 
     const sendMessage = async (event) => {
@@ -228,7 +242,8 @@ export const ChatBox = ({rcvEmail, rcvName}) => {
                 <div className="messages">
                     {messages.map((message, index) => (
                         <div key={index}
-                             className={`message ${message.sender_email === user.email ? "you" : "other"}`}>
+                             className={`message ${message.sender_email === user.email ? "you" :
+                                 message.sender_email === "0" ? "system" : "other"}`}>
                             {
                                 message.sender_email === "0" ?
                                     <img className="avatar"
