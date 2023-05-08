@@ -104,13 +104,17 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
                 console.error("Failed to get activity info on activities page");
             } else {
                 const aData = resp.data.data;
-                if (me.email === aData["user1_email"] && aData["user1_accept"]) {
-                    setIAccepted(true);
+                if (me.email === aData["user1_email"]) {
+                    if (aData["user1_accept"]) {
+                        setIAccepted(true);
+                    }
                     if (aData["user2_accept"]) {
                         setOAccepted(true);
                     }
-                } else if (me.email === aData["user2_email"] && aData["user2_accept"]) {
-                    setIAccepted(true);
+                } else if (me.email === aData["user2_email"]) {
+                    if (aData["user2_accept"]) {
+                        setIAccepted(true);
+                    }
                     if (aData["user1_accept"]) {
                         setOAccepted(true);
                     }
@@ -155,7 +159,7 @@ export const ActivityPage = ({id, rcvEmail, rcvName}) => {
             <ActivityPageBase>
                 <h2>Loading Activity Info...</h2>
             </ActivityPageBase>
-        )
+        );
     }
 
     return (
